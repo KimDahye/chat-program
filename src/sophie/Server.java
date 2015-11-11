@@ -1,9 +1,6 @@
 package sophie;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -15,8 +12,9 @@ import java.net.Socket;
 public class Server {
     private ServerSocket listener = null;
     private Socket socket = null;
-    BufferedReader input = null;
-    PrintWriter output = null;
+    private DataInputStream  streamIn  =  null;
+    private DataOutputStream streamOut = null;
+
     private boolean done = false;
     private static final int DEFAULT_PORT = 9000;
 
@@ -56,8 +54,8 @@ public class Server {
 
     private void closeResource() {
         try {
-            input.close();
-            output.close();
+            streamIn.close();
+            streamOut.close();
             socket.close();
             listener.close();
         } catch (IOException ioe) {
@@ -68,7 +66,6 @@ public class Server {
 
     private void echo() {
         String message = messageRead();
-        System.out.println(message);
         messageWrite(message);
 
         if(message.equals(".bye")){
@@ -78,8 +75,8 @@ public class Server {
 
     private void prepareReaderAndWriter() {
         try {
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            output = new PrintWriter(socket.getOutputStream(), true);
+            streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            streamOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         } catch (IOException ioe) {
             System.out.println(ioe); //연결이 끊겼거나 등등 inputStream을 가져올 수없을 때
             System.exit(1);
@@ -88,7 +85,9 @@ public class Server {
 
     private String messageRead() {
         try {
-            return input.readLine();
+            String line = streamIn.readUTF();
+            System.out.println("server read: " + line);
+            return line;
         } catch (IOException ioe) {
             System.out.println(ioe); //연결이 끊겼거나 등등 inputStream을 가져올 수없을 때
             done = true;
@@ -97,9 +96,14 @@ public class Server {
     }
 
     private void messageWrite(String message) {
-        output.print(message); //TODO. println안해도 되겠지? message에 /n 이 속해있지 않을까?
+        try {
+            streamOut.writeUTF(message);
+            streamOut.flush();
+        } catch (IOException ioe) {
+            System.out.println(ioe); //연결이 끊겼거나 등등 inputStream을 가져올 수없을 때
+            done = true;
+        }
     }
-
 
     /* main method */
     public static void main(String args[]) {

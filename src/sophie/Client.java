@@ -1,10 +1,6 @@
 package sophie;
 
-import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -13,8 +9,8 @@ import java.util.Scanner;
  */
 public class Client {
     private Socket socket = null;
-    BufferedReader input = null;
-    PrintWriter output = null;
+    private DataInputStream streamIn  =  null;
+    private DataOutputStream streamOut = null;
     private boolean done = false;
     private static final int DEFAULT_PORT = 9000;
 
@@ -54,10 +50,10 @@ public class Client {
     }
 
     private void prepareReaderAndWriter() {
-        //TODO. reader, writer 관련 메소드를 하나의 클래스로 빼자. helper class
+        // TODO. reader, writer 관련 메소드를 하나의 클래스로 빼자. helper class
         try {
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            output = new PrintWriter(socket.getOutputStream(), true);
+            streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            streamOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         } catch (IOException ioe) {
             System.out.println(ioe); //연결이 끊겼거나 등등 inputStream을 가져올 수없을 때
             System.exit(1);
@@ -66,8 +62,8 @@ public class Client {
 
     private void closeResource() {
         try {
-            input.close();
-            output.close();
+            streamIn.close();
+            streamOut.close();
             socket.close();
         } catch (IOException ioe) {
             System.out.println(ioe); // TODO. #1
@@ -77,7 +73,9 @@ public class Client {
 
     private String messageRead() {
         try {
-            return input.readLine();
+            String line = streamIn.readUTF();
+            System.out.println("client read: " + line);
+            return line;
         } catch (IOException ioe) {
             System.out.println(ioe); //연결이 끊겼거나 등등 inputStream을 가져올 수없을 때
             done = true;
@@ -86,13 +84,17 @@ public class Client {
     }
 
     private void messageWrite(String message) {
-        output.print(message); //TODO. println안해도 되겠지? message에 /n 이 속해있지 않을까?
+        try {
+            streamOut.writeUTF(message);
+            streamOut.flush();
+        } catch (IOException ioe) {
+            System.out.println(ioe); //연결이 끊겼거나 등등 inputStream을 가져올 수없을 때
+            done = true;
+        }
     }
 
     public static void main(String[] args) throws IOException {
         Client client = new Client();
         client.run(DEFAULT_PORT); //나중에 PORT 번호를 받을 수 있도록 하기 위해
     }
-
-
 }
