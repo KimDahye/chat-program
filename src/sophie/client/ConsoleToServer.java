@@ -8,7 +8,7 @@ import java.util.Scanner;
 /**
  * Created by sophie on 2015. 11. 16..
  */
-public class ConsoleToServer {
+public class ConsoleToServer extends Thread {
 
     private Scanner scanner = new Scanner(System.in);
     private PrintWriter writer = null;
@@ -27,9 +27,11 @@ public class ConsoleToServer {
         }
     }
 
-    public void stop() {
+    @Override
+    public void interrupt() {
         scanner.close();
         writer.close();
+        super.interrupt();
     }
 
 }

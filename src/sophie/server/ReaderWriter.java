@@ -22,7 +22,7 @@ public class ReaderWriter {
     }
 
     public void write(String msg) {
-        writer.println(msg + '\n');
+        writer.println(msg);
     }
 
     public void close() throws IOException {
