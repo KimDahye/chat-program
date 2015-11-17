@@ -45,7 +45,7 @@ public class Client {
         consoleToServer.interrupt();
         serverToConsole.interrupt();
         socket.close();
-        System.exit(0); //정상 종료
+        System.exit(0);
     }
 
     public static void main(String args[]) {

@@ -21,7 +21,7 @@ public class ReaderWriter {
         return reader.readLine();
     }
 
-    public void write(String msg) {
+    public void writeLine(String msg) {
         writer.println(msg);
     }
 

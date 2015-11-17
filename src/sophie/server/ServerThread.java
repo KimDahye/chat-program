@@ -31,14 +31,15 @@ public class ServerThread extends Thread{
     }
 
     public void send(String msg) {
-        readerWriter.write(socket.getPort() + ": " + msg);
+        readerWriter.writeLine(socket.getPort() + ": " + msg);
     }
 
     public void sendBye(String endMsg){
-        readerWriter.write(endMsg);
+        readerWriter.writeLine(endMsg);
     }
 
     public void close() throws IOException {
+        socket.close();
         readerWriter.close();
     }
 
