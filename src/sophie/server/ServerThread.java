@@ -34,8 +34,8 @@ public class ServerThread extends Thread{
         readerWriter.write(socket.getPort() + ": " + msg);
     }
 
-    public void sendBye(){
-        readerWriter.write(".Bye");
+    public void sendBye(String endMsg){
+        readerWriter.write(endMsg);
     }
 
     public void close() throws IOException {

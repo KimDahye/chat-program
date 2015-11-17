@@ -11,6 +11,7 @@ public class ServerHandler {
     private ArrayList<ServerThread> serverThreads = null;
     private int curThreadNum = 0;
     private int threadMaxNum = 0;
+    private static final String END_MESSAGE = ".bye";
 
     ServerHandler(int maxClientNum) {
         serverThreads = new ArrayList<ServerThread>(maxClientNum);
@@ -18,9 +19,9 @@ public class ServerHandler {
     }
 
     public void handle(int port, String msg) {
-        if (msg.equals(".bye")) {
+        if (msg.equals(END_MESSAGE)) {
             int index = findThreadIndex(port);
-            serverThreads.get(index).sendBye();
+            serverThreads.get(index).sendBye(END_MESSAGE);
             remove(index);
         } else {
             for (ServerThread thread : serverThreads) {
@@ -49,7 +50,7 @@ public class ServerHandler {
         curThreadNum--;
         try {
             toTerminate.close();
-            //toTerminate.stop() 대신 toTerminate.interrupt() 이거 쓰는 건가?
+            toTerminate.interrupt();
         } catch (IOException e) {
             e.printStackTrace();
         }

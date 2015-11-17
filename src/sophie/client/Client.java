@@ -11,6 +11,8 @@ public class Client {
     private Socket socket = null;
     private Thread consoleToServer = null;
     private Thread serverToConsole = null;
+    private static final String END_MESSAGE = ".bye";
+
 
     public Client(String serverName, int serverPort) {
         try {
@@ -33,15 +35,17 @@ public class Client {
     }
 
     public void handle(String serverMsg) throws IOException {
-        if (serverMsg.equals(".bye")) {
-            close();
+        if (serverMsg.equals(END_MESSAGE)) {
+            System.out.println("Good Bye~!");
+            closeAllResources();
         }
     }
 
-    public void close() throws IOException {
+    public void closeAllResources() throws IOException {
         consoleToServer.interrupt();
         serverToConsole.interrupt();
         socket.close();
+        System.exit(0); //정상 종료
     }
 
     public static void main(String args[]) {
