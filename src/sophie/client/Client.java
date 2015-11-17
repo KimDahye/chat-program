@@ -11,6 +11,7 @@ public class Client {
     private Socket socket = null;
     private Thread consoleToServer = null;
     private Thread serverToConsole = null;
+
     private static final String END_MESSAGE = ".bye";
 
 
@@ -23,8 +24,8 @@ public class Client {
         } catch (UnknownHostException uhe) {
             uhe.printStackTrace();
             System.exit(1);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
             System.exit(1);
         }
     }

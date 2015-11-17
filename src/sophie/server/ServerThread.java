@@ -24,8 +24,8 @@ public class ServerThread extends Thread{
             try {
                 String  msg = readerWriter.readLine();
                 serverHandler.handle(socket.getPort(), msg);
-            } catch (IOException ioe) {
-
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

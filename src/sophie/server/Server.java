@@ -8,7 +8,6 @@ import java.net.ServerSocket;
  */
 public class Server {
     private ServerSocket listener = null;
-
     private ServerHandler serverHandler = null;
 
     public Server(int port, int maxClientNum) {
@@ -18,19 +17,24 @@ public class Server {
             System.out.println("Server started: " + listener);
             serverHandler = new ServerHandler(maxClientNum);
 
-        } catch (IOException ioe) {
-            System.out.println("Can not bind to port " + port + ": " + ioe.getMessage());
+        } catch (IOException e) {
+            System.out.println("Can not bind to port " + port + ": " + e.getMessage());
             System.exit(1);
         }
     }
 
-    public void operate(){
-        while(true) {
+    public void operate() {
+        while (true) {
             try {
                 serverHandler.addClient(listener.accept());
             } catch (IOException e) {
                 e.printStackTrace();
-                //listener, clientManger 닫아야 하나?
+                // 여기서 나오는 Exception까지 잡아버리면 너무 코드가 보기 싫어지는데... 어떻게 해야하나..? ㅠㅠ
+                try {
+                    listener.close();
+                } catch(IOException e2) {
+                    e2.printStackTrace();
+                }
                 System.exit(1);
             }
         }
