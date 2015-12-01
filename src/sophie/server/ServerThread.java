@@ -5,24 +5,23 @@ import java.net.Socket;
 
 /**
  * Created by sophie on 2015. 11. 16..
- * TODO. 적당한 이름을 못 짓겠음 ㅠㅠ 일단 대충 지었다. ClientReader
  */
-public class ServerThread extends Thread{
+public class ServerThread extends Thread {
     private Socket socket = null;
     private ReaderWriter readerWriter;
     private ServerHandler serverHandler;
 
-    public ServerThread (ServerHandler serverHandler, Socket socket) throws IOException{
+    public ServerThread(ServerHandler serverHandler, Socket socket) throws IOException {
         this.socket = socket;
         this.serverHandler = serverHandler;
         readerWriter = new ReaderWriter();
         readerWriter.open(socket);
     }
 
-    public void run () {
-        while(true){
+    public void run() {
+        while (true) {
             try {
-                String  msg = readerWriter.readLine();
+                String msg = readerWriter.readLine();
                 serverHandler.handle(socket.getPort(), msg);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -34,7 +33,7 @@ public class ServerThread extends Thread{
         readerWriter.writeLine(socket.getPort() + ": " + msg);
     }
 
-    public void sendBye(String endMsg){
+    public void sendBye(String endMsg) {
         readerWriter.writeLine(endMsg);
     }
 

@@ -30,7 +30,6 @@ public class ServerToConsole extends Thread{
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-
         }
     }
 
