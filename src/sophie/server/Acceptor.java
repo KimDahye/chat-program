@@ -1,32 +1,42 @@
 package sophie.server;
 
+import sophie.client.Client;
+
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * Created by sophie on 2015. 11. 16..
+ * Created by sophie on 2015. 12. 2..
  */
-public class Server {
+public class Acceptor {
     private ServerSocket listener = null;
-    private ServerHandler serverHandler = null;
+    private RoomListManager roomListManager = null;
+    private ExecutorService executor = null;
+    private static final int MAX_THREAD_NUM = 100; //RoomSelector Thread 개수
 
-    public Server(int port, int maxClientNum) {
+
+    public Acceptor(int port) {
         try {
             System.out.println("Binding to port " + port + ", please wait  ...");
             listener = new ServerSocket(port);
             System.out.println("Server started: " + listener);
-            serverHandler = new ServerHandler(maxClientNum);
-
+            roomListManager = RoomListManager.getInstance();
+            executor = Executors.newFixedThreadPool(MAX_THREAD_NUM);
         } catch (IOException e) {
             System.out.println("Can not bind to port " + port + ": " + e.getMessage());
             System.exit(1);
         }
     }
 
-    public void operate() {
+    public void accept() {
         while (true) {
             try {
-                serverHandler.addClient(listener.accept());
+                Socket client = listener.accept();
+                ClientHandler clientHandler = new ClientHandler(client);
+                executor.execute(new RoomSelector(clientHandler, roomListManager));
             } catch (IOException e) {
                 e.printStackTrace();
                 // 여기서 나오는 Exception까지 잡아버리면 너무 코드가 보기 싫어지는데... 어떻게 해야하나..? ㅠㅠ
@@ -42,9 +52,9 @@ public class Server {
 
     public static void main(String args[]) {
         final int DEFAULT_PORT = 9001;
-        final int MAX_CLIENT_NUMBER = 10;
+        //final int ROOM_CAPACITY = 10;
 
-        Server server = new Server(DEFAULT_PORT, MAX_CLIENT_NUMBER);
-        server.operate();
+        Acceptor acceptor = new Acceptor(DEFAULT_PORT);
+        acceptor.accept();
     }
 }
