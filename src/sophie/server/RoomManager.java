@@ -40,7 +40,7 @@ public class RoomManager {
             remove(findClientIndex(clientHandler));
         } else {
             for (ClientHandler c : clients) {
-                if (c != null) c.send(msg);
+                if (c != null) c.send(clientHandler.getNickname() + ": " + msg);
             }
         }
     }

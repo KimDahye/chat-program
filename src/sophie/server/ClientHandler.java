@@ -54,4 +54,12 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         }
     }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

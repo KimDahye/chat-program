@@ -12,6 +12,7 @@ public class RoomSelector implements Runnable {
     private static final String ASKING_MESSAGE_ROOM_NUMBER = "Enter room number if you want to participate: ";
     private static final String CLIENT_MESSAGE_WANT_TO_MAKE_ROOM = "yes";
     private static final String INFO_MESSAGE_NO_ROOM = "There is no room. You should make the first room!";
+    private static final String ASKING_MESSAGE_NICKNAME = "Enter your nickname: ";
 
     RoomSelector(ClientHandler clientHandler, RoomListManager roomListManager) {
         this.clientHandler = clientHandler;
@@ -21,6 +22,8 @@ public class RoomSelector implements Runnable {
     @Override
     public void run() {
         //ClientHandler에 client 의 닉네임 넣는 기능 넣기
+        String nickname = askNickname();
+        clientHandler.setNickname(nickname);
 
         //방이 없을 때
         if(isRoomListEmpty()){
@@ -31,14 +34,18 @@ public class RoomSelector implements Runnable {
 
         // 방이 있을 때
         sendRoomInfo();
-
         if(askWannaMakeRoom(clientHandler)){
             makeRoom();
             return;
         }
-
         int roomNum = askWhichRoom();
         roomListManager.participateRoomAt(roomNum, clientHandler);
+    }
+
+    private String askNickname(){
+        clientHandler.send(ASKING_MESSAGE_NICKNAME);
+        String msg = clientHandler.receive();
+        return msg;
     }
 
     private boolean askWannaMakeRoom(ClientHandler clientHandler) {
