@@ -11,6 +11,7 @@ public class RoomSelector implements Runnable {
     private static final String ASKING_MESSAGE_ROOM_NAME = "Type the room name you want to make: ";
     private static final String ASKING_MESSAGE_ROOM_NUMBER = "Enter room number if you want to participate: ";
     private static final String CLIENT_MESSAGE_WANT_TO_MAKE_ROOM = "yes";
+    private static final String INFO_MESSAGE_NO_ROOM = "There is no room. You should make the first room!";
 
     RoomSelector(ClientHandler clientHandler, RoomListManager roomListManager) {
         this.clientHandler = clientHandler;
@@ -21,28 +22,37 @@ public class RoomSelector implements Runnable {
     public void run() {
         //ClientHandler에 client 의 닉네임 넣는 기능 넣기
 
-        if(doYouWannaMake(clientHandler)){
-            String roomName = decideRoomName();
-            roomListManager.makeRoom(roomName, clientHandler);
+        //방이 없을 때
+        if(isRoomListEmpty()){
+            sendEmptyRoomInfo();
+            makeRoom();
             return;
         }
 
-        int roomNum = whichRoom();
+        // 방이 있을 때
+        sendRoomInfo();
+
+        if(askWannaMakeRoom(clientHandler)){
+            makeRoom();
+            return;
+        }
+
+        int roomNum = askWhichRoom();
         roomListManager.participateRoomAt(roomNum, clientHandler);
     }
 
-    private boolean doYouWannaMake(ClientHandler clientHandler) {
-        clientHandler.send(ASKING_MESSAGE_MAKING + roomListManager.getAvailableRoomInfoList());
+    private boolean askWannaMakeRoom(ClientHandler clientHandler) {
+        clientHandler.send(ASKING_MESSAGE_MAKING);
         String msg = clientHandler.receive();
         return msg.equals(CLIENT_MESSAGE_WANT_TO_MAKE_ROOM);
     }
 
-    private String decideRoomName() {
+    private String askRoomName() {
         clientHandler.send(ASKING_MESSAGE_ROOM_NAME);
         return clientHandler.receive();
     }
 
-    private int whichRoom() {
+    private int askWhichRoom() {
         boolean isPassable;
         int roomNumber = -1;
         do {
@@ -56,5 +66,22 @@ public class RoomSelector implements Runnable {
             }
         } while(!isPassable);
         return roomNumber;
+    }
+
+    private void sendRoomInfo() {
+        clientHandler.send("room info: " + roomListManager.getAvailableRoomInfoList());
+    }
+
+    private void sendEmptyRoomInfo() {
+        clientHandler.send(INFO_MESSAGE_NO_ROOM);
+    }
+
+    private void makeRoom() {
+        String roomName = askRoomName();
+        roomListManager.makeRoom(roomName, clientHandler);
+    }
+
+    private boolean isRoomListEmpty(){
+        return roomListManager.isRoomListEmpty();
     }
 }

@@ -52,15 +52,19 @@ public class RoomListManager {
     }
 
     public void participateRoomAt(int roomNum, ClientHandler clientHandler) {
-        // TODO. 구현
         //O(1)으로 찾으면 좋겠는데? => ArrayList가 아닌 HashMap을 쓰자! => 완료
         roomList.get(roomNum).addClient(clientHandler);
+    }
+
+    public boolean isRoomListEmpty(){
+        return roomList.isEmpty();
     }
 
     private int autoIncrementRoomNumber() {
         //singleton이니까 synchronized 붙일 필요 없다.
         return ++roomNumber;
     }
+
 
     //remove room 은 외부 태스크로 주기적으로 방에 애들 아무도 없으면 없애는 것으로? 고민해보자. RoomManager에서 자기 없애라고 할 것인지...
 }
