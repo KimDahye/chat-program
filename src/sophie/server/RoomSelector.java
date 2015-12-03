@@ -3,7 +3,7 @@ package sophie.server;
 /**
  * Created by sophie on 2015. 12. 2..
  */
-public class RoomSelector implements Runnable {
+class RoomSelector implements Runnable {
     // 클래스 이름이 before participate room 이런 거였으면 좋겠는데? room selecting 이외에도 닉네임 결정 등 다양한 것들 할 수 있는듯?
     private ClientHandler clientHandler;
     private RoomListManager roomListManager;

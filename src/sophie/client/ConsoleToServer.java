@@ -8,12 +8,12 @@ import java.util.Scanner;
 /**
  * Created by sophie on 2015. 11. 16..
  */
-public class ConsoleToServer extends Thread {
+class ConsoleToServer extends Thread {
 
     private Scanner scanner = new Scanner(System.in);
     private PrintWriter writer = null;
 
-    public ConsoleToServer(Socket socket) {
+    ConsoleToServer(Socket socket) {
         try {
             writer = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
@@ -21,6 +21,7 @@ public class ConsoleToServer extends Thread {
         }
     }
 
+    @Override
     public void run() {
         while (true) {
             writer.println(scanner.nextLine());

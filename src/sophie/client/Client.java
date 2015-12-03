@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by sophie on 2015. 11. 16..
  */
-public class Client {
+class Client {
     private Socket socket = null;
     private ExecutorService executor = null;
     private static final int THREAD_NUMBER = 2;
@@ -18,7 +18,7 @@ public class Client {
     private static final String END_MESSAGE = ".bye";
 
 
-    public Client(String serverName, int serverPort) {
+    Client(String serverName, int serverPort) {
         try {
             socket = new Socket(serverName, serverPort);
             System.out.println("Connected: " + socket);
@@ -32,19 +32,19 @@ public class Client {
         }
     }
 
-    public void operate() {
+    void operate() {
         executor.execute(new Thread(new ConsoleToServer(socket)));
         executor.execute(new Thread(new ServerToConsole(this, socket)));
     }
 
-    public void handle(String serverMsg) throws IOException {
+    void handle(String serverMsg) throws IOException {
         if (serverMsg.equals(END_MESSAGE)) {
             System.out.println("Good Bye~!");
             closeAllResources();
         }
     }
 
-    public void closeAllResources() throws IOException {
+    void closeAllResources() throws IOException {
         executor.shutdown(); //ThreadPoolExecution 의 shutdown 메소드에서 큐에 있는 Thread를 interrupt 하니깐 override 된 interrupt 메소드가 잘 불릴 것이라 예상함.
         socket.close();
         System.exit(0);

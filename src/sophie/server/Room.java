@@ -3,7 +3,7 @@ package sophie.server;
 /**
  * Created by sophie on 2015. 12. 2..
  */
-public class Room {
+class Room {
     private final int number;
     private final String name;
 
@@ -12,11 +12,11 @@ public class Room {
         this.name = name;
     }
 
-    public int getNumber() {
+    int getNumber() {
         return number;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 

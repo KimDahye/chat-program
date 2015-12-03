@@ -7,20 +7,21 @@ import java.util.HashMap;
 /**
  * Created by sophie on 2015. 12. 2..
  */
-public class RoomListManager {
+class RoomListManager {
     private HashMap<Integer, RoomManager> roomList = new HashMap<Integer, RoomManager>();
     private static final RoomListManager instance = new RoomListManager(); //singleton
     private static final int MAX_THREAD_NUM = 100; // ClientHandler 쓰레드 풀의 max number
     private static int roomNumber = 0;
 
     private RoomListManager() {
-    };
+        //singleton
+    }
 
-    public static RoomListManager getInstance() {
+    static RoomListManager getInstance() {
         return instance;
     }
 
-    public String getAvailableRoomInfoList() {
+    String getAvailableRoomInfoList() {
         // capacity가 MAX_THREAD_NUM 미만 인것만 알려준다.
         String result = "";
         for(Integer key : roomList.keySet()) {
@@ -30,7 +31,7 @@ public class RoomListManager {
         return result;
     }
 
-    public boolean isExistentRoomNumber(int num) {
+    boolean isExistentRoomNumber(int num) {
         //room number 중 있는 number 인지
         for(Integer key : roomList.keySet() ){
             if(roomList.get(key).isYourRoomNumber(num)){
@@ -40,7 +41,7 @@ public class RoomListManager {
         return false;
     }
 
-    public void makeRoom(String roomName, ClientHandler clientHandler) {
+    void makeRoom(String roomName, ClientHandler clientHandler) {
         // 새로운 RoomManager 만들고, - unique 번호 make 해야함. autoIncrementRoomNumber 이용하자. -
         // roomList 에 add 해주고.
         // 거기에 add client (clientHandler)
@@ -50,12 +51,12 @@ public class RoomListManager {
         newRoom.addClient(clientHandler);
     }
 
-    public void participateRoomAt(int roomNum, ClientHandler clientHandler) {
+    void participateRoomAt(int roomNum, ClientHandler clientHandler) {
         //O(1)으로 찾으면 좋겠는데? => ArrayList가 아닌 HashMap을 쓰자! => 완료
         roomList.get(roomNum).addClient(clientHandler);
     }
 
-    public boolean isRoomListEmpty(){
+    boolean isRoomListEmpty(){
         return roomList.isEmpty();
     }
 

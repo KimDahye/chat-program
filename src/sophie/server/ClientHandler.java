@@ -6,22 +6,23 @@ import java.net.Socket;
 /**
  * Created by sophie on 2015. 12. 2..
  */
-public class ClientHandler extends Thread {
+class ClientHandler extends Thread {
     private Socket socket = null;
     private ReaderWriter readerWriter = null;
     private RoomManager roomManager = null;
     private String nickname = null; // unique 하면 좋지만 그건 DB에 저장할 때 처리될 부분이라 생각하여 패스.
 
-    public ClientHandler(Socket socket) throws IOException {
+    ClientHandler(Socket socket) throws IOException {
         this.socket = socket;
         readerWriter = new ReaderWriter();
         readerWriter.open(socket);
     }
 
-    public void setRoomManager(RoomManager roomManager) {
+    void setRoomManager(RoomManager roomManager) {
         this.roomManager = roomManager;
     }
 
+    @Override
     public void run() {
         while (true) {
             String msg = receive();
@@ -29,7 +30,7 @@ public class ClientHandler extends Thread {
         }
     }
 
-    public String receive( ) {
+    String receive( ) {
         try {
             return readerWriter.readLine();
         }catch (IOException e){
@@ -38,15 +39,15 @@ public class ClientHandler extends Thread {
         return null;
     }
 
-    public void send(String msg) {
+    void send(String msg) {
         readerWriter.writeLine(msg);
     }
 
-    public void sendBye(String endMsg) {
+    void sendBye(String endMsg) {
         readerWriter.writeLine(endMsg);
     }
 
-    public void close() {
+    void close() {
         try {
             socket.close();
             readerWriter.close();
@@ -55,7 +56,7 @@ public class ClientHandler extends Thread {
         }
     }
 
-    public String getNickname() {
+    String getNickname() {
         return nickname;
     }
 

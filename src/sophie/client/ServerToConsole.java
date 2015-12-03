@@ -8,11 +8,11 @@ import java.net.Socket;
 /**
  * Created by sophie on 2015. 11. 16..
  */
-public class ServerToConsole extends Thread{
+class ServerToConsole extends Thread{
     Client handler = null;
     private BufferedReader reader = null;
 
-    public ServerToConsole(Client handler, Socket socket) {
+    ServerToConsole(Client handler, Socket socket) {
         try {
             this.handler = handler;
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -21,6 +21,7 @@ public class ServerToConsole extends Thread{
         }
     }
 
+    @Override
     public void run() {
         while (true) {
             try {

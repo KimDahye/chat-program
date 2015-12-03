@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by sophie on 2015. 12. 2..
  */
-public class RoomManager {
+class RoomManager {
     private Room room;
     private ArrayList<ClientHandler> clients = null;
     private ExecutorService executor = null;

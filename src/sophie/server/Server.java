@@ -9,14 +9,14 @@ import java.util.concurrent.Executors;
 /**
  * Created by sophie on 2015. 12. 2..
  */
-public class Server {
+class Server {
     private ServerSocket listener = null;
     private RoomListManager roomListManager = null;
     private ExecutorService executor = null;
     private static final int MAX_THREAD_NUM = 100; //RoomSelector Thread 개수
 
 
-    public Server(int port) {
+    Server(int port) {
         try {
             System.out.println("Binding to port " + port + ", please wait  ...");
             listener = new ServerSocket(port);
@@ -29,7 +29,7 @@ public class Server {
         }
     }
 
-    public void accept() {
+    void accept() {
         while (true) {
             try {
                 Socket client = listener.accept();
@@ -48,7 +48,7 @@ public class Server {
         }
     }
 
-    public static void main(String args[]) {
+   public static void main(String args[]) {
         final int DEFAULT_PORT = 9001;
         //final int ROOM_CAPACITY = 10;
 
