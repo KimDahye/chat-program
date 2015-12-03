@@ -1,7 +1,5 @@
 package sophie.server;
 
-import sophie.client.Client;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,14 +9,14 @@ import java.util.concurrent.Executors;
 /**
  * Created by sophie on 2015. 12. 2..
  */
-public class Acceptor {
+public class Server {
     private ServerSocket listener = null;
     private RoomListManager roomListManager = null;
     private ExecutorService executor = null;
     private static final int MAX_THREAD_NUM = 100; //RoomSelector Thread 개수
 
 
-    public Acceptor(int port) {
+    public Server(int port) {
         try {
             System.out.println("Binding to port " + port + ", please wait  ...");
             listener = new ServerSocket(port);
@@ -54,7 +52,7 @@ public class Acceptor {
         final int DEFAULT_PORT = 9001;
         //final int ROOM_CAPACITY = 10;
 
-        Acceptor acceptor = new Acceptor(DEFAULT_PORT);
-        acceptor.accept();
+        Server server = new Server(DEFAULT_PORT);
+        server.accept();
     }
 }

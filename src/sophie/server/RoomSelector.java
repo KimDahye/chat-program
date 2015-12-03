@@ -23,7 +23,7 @@ public class RoomSelector implements Runnable {
 
         if(doYouWannaMake(clientHandler)){
             String roomName = decideRoomName();
-            roomListManager.makeRoom(clientHandler, roomName);
+            roomListManager.makeRoom(roomName, clientHandler);
             return;
         }
 
@@ -32,7 +32,7 @@ public class RoomSelector implements Runnable {
     }
 
     private boolean doYouWannaMake(ClientHandler clientHandler) {
-        clientHandler.send(ASKING_MESSAGE_MAKING + roomListManager.getRoomNumberList());
+        clientHandler.send(ASKING_MESSAGE_MAKING + roomListManager.getAvailableRoomInfoList());
         String msg = clientHandler.receive();
         return msg.equals(CLIENT_MESSAGE_WANT_TO_MAKE_ROOM);
     }

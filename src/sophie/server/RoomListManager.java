@@ -2,13 +2,13 @@ package sophie.server;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by sophie on 2015. 12. 2..
  */
 public class RoomListManager {
-    private ArrayList<RoomManager> roomList = new ArrayList<RoomManager>();
-
+    private HashMap<Integer, RoomManager> roomList = new HashMap<Integer, RoomManager>();
     private static final RoomListManager instance = new RoomListManager(); //singleton
     private static final int MAX_THREAD_NUM = 100; // ClientHandler 쓰레드 풀의 max number
     private static int roomNumber = 0;
@@ -21,28 +21,40 @@ public class RoomListManager {
         return instance;
     }
 
-    public String getRoomNumberList() {
-        // TODO. 구현
-        // room number를 (2/3/4) 이런 식으로 보냄. -
-        // capacity가 MAX_THREAD_NUM 미만 인것만 보낸다.
-        return null;
+    public String getAvailableRoomInfoList() {
+        // capacity가 MAX_THREAD_NUM 미만 인것만 알려준다.
+        String result = "";
+        for(Integer key : roomList.keySet()) {
+            result = result + roomList.get(key).getAvailableRoomInfo();
+        }
+
+        return result;
     }
 
     public boolean isExistentRoomNumber(int num) {
-        // TODO. 구현
         //room number 중 있는 number 인지
+        for(Integer key : roomList.keySet() ){
+            if(roomList.get(key).isYourRoomNumber(num)){
+                return true;
+            }
+        }
         return false;
     }
 
-    public void makeRoom(ClientHandler clientHandler, String roomName) {
-        // TODO. 구현
+    public void makeRoom(String roomName, ClientHandler clientHandler) {
         // 새로운 RoomManager 만들고, - unique 번호 make 해야함. autoIncrementRoomNumber 이용하자. -
         // roomList 에 add 해주고.
         // 거기에 add client (clientHandler)
+        Integer roomNum = autoIncrementRoomNumber();
+        RoomManager newRoom = new RoomManager(roomNum, roomName, MAX_THREAD_NUM);
+        roomList.put(roomNum, newRoom);
+        newRoom.addClient(clientHandler);
     }
 
     public void participateRoomAt(int roomNum, ClientHandler clientHandler) {
         // TODO. 구현
+        //O(1)으로 찾으면 좋겠는데? => ArrayList가 아닌 HashMap을 쓰자! => 완료
+        roomList.get(roomNum).addClient(clientHandler);
     }
 
     private int autoIncrementRoomNumber() {
