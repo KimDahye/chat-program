@@ -25,18 +25,31 @@ class ClientHandler extends Thread {
     @Override
     public void run() {
         while (true) {
-            String msg = receive();
-            roomManager.handle(this, msg);
+            try {
+                String msg = receiveWithException();
+                roomManager.handle(this, msg);
+            }catch (IOException e) {
+                //연결이 끝났으니 while loop break해야함.
+                // e.printStackTrace();
+                System.out.println(nickname + " is disconnected.");
+                break;
+            }
+
         }
     }
 
-    String receive( ) {
+    String receive(){
+        //이것은 IOExceiption 던지지 않는 용도.
         try {
             return readerWriter.readLine();
         }catch (IOException e){
-            e.getStackTrace();
+            e.printStackTrace();
         }
         return null;
+    }
+
+    private String receiveWithException() throws IOException{
+        return readerWriter.readLine();
     }
 
     void send(String msg) {

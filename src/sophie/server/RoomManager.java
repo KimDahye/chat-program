@@ -1,7 +1,5 @@
 package sophie.server;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +35,7 @@ class RoomManager {
     void handle(ClientHandler clientHandler, String msg) {
         if (msg.equals(END_MESSAGE)) {
             clientHandler.sendBye(END_MESSAGE);
+            clientHandler.close();
             remove(findClientIndex(clientHandler));
         } else {
             for (ClientHandler c : clients) {
@@ -60,8 +59,6 @@ class RoomManager {
         }
         return null;
     }
-
-
 
     private int findClientIndex(ClientHandler clientHandler) {
         for (int i = 0; i < clients.size(); i++) {
