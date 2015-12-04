@@ -24,6 +24,7 @@ class ConsoleToServer extends Thread {
     @Override
     public void run() {
         while (true) {
+
             writer.println(scanner.nextLine());
         }
     }

@@ -10,9 +10,11 @@ import java.util.concurrent.Executors;
 class RoomManager {
     private Room room;
     private ArrayList<ClientHandler> clients = null;
+    private FileReceiverSender fileReceiverSender = null;
     private ExecutorService executor = null;
     private int roomCapacity = 0;
     private static final String END_MESSAGE = ".bye";
+    private static final String DATA_MESSAGE = ".file";
 
     RoomManager(int roomNumber, String roomName, int maxThreadNum) {
         this.room = new Room(roomNumber, roomName);
@@ -33,10 +35,15 @@ class RoomManager {
     }
 
     void handle(ClientHandler clientHandler, String msg) {
+        //TODO. 각 역할에 따라 인터페이스로 뽑고 추상화해서 돌리자!
         if (msg.equals(END_MESSAGE)) {
             clientHandler.sendBye(END_MESSAGE);
             clientHandler.close();
             remove(findClientIndex(clientHandler));
+        } else if (msg.startsWith(DATA_MESSAGE)){
+            String fileName = msg.split(" ")[1];
+            fileReceiverSender = new FileReceiverSender(clients, clientHandler);
+            executor.execute(fileReceiverSender);
         } else {
             for (ClientHandler c : clients) {
                 if (c != null) c.send(clientHandler.getNickname() + ": " + msg);

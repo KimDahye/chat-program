@@ -51,10 +51,11 @@ class Client {
     }
 
     public static void main(String args[]) {
-        final int DEFAULT_PORT = 9001;
+        final int CHATTING_PORT = 9001;
+        //final int FILE_PORT =
         final String DEFAULT_SERVER_ADDRESS = "127.0.0.1";
 
-        Client client = new Client(DEFAULT_SERVER_ADDRESS, DEFAULT_PORT);
+        Client client = new Client(DEFAULT_SERVER_ADDRESS, CHATTING_PORT);
         client.operate();
     }
 }

@@ -3,6 +3,7 @@ package sophie.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,20 +12,22 @@ import java.util.concurrent.Executors;
  */
 class Server {
     private ServerSocket listener = null;
+    private ServerSocket dataListener = null;
     private RoomListManager roomListManager = null;
     private ExecutorService executor = null;
     private static final int MAX_THREAD_NUM = 100; //RoomSelector Thread 개수
 
-
-    Server(int port) {
+    Server(int messagePort, int dataPort) {
         try {
-            System.out.println("Binding to port " + port + ", please wait  ...");
-            listener = new ServerSocket(port);
+            System.out.println("Binding to port " + messagePort + ", please wait  ...");
+            listener = new ServerSocket(messagePort);
+            dataListener = new ServerSocket(dataPort);
             System.out.println("Server started: " + listener);
+            System.out.println("Data socket starated:" + dataListener);
             roomListManager = RoomListManager.getInstance();
             executor = Executors.newFixedThreadPool(MAX_THREAD_NUM);
         } catch (IOException e) {
-            System.out.println("Can not bind to port " + port + ": " + e.getMessage());
+            System.out.println("Can not bind to port " + messagePort + ": " + e.getMessage());
             System.exit(1);
         }
     }
@@ -33,14 +36,15 @@ class Server {
         while (true) {
             try {
                 Socket client = listener.accept();
-                ClientHandler clientHandler = new ClientHandler(client);
+                Socket dataSocket = dataListener.accept();
+                ClientHandler clientHandler = new ClientHandler(client, dataSocket);
                 executor.execute(new RoomSelector(clientHandler, roomListManager));
             } catch (IOException e) {
                 e.printStackTrace();
                 // 여기서 나오는 Exception까지 잡아버리면 너무 코드가 보기 싫어지는데... 어떻게 해야하나..? ㅠㅠ
                 try {
                     listener.close();
-                } catch(IOException e2) {
+                } catch (IOException e2) {
                     e2.printStackTrace();
                 }
                 System.exit(1);
@@ -48,11 +52,12 @@ class Server {
         }
     }
 
-   public static void main(String args[]) {
-        final int DEFAULT_PORT = 9001;
+    public static void main(String args[]) {
+        final int MESSAGE_PORT = 9001;
+        final int DATA_PORT = 9002;
         //final int ROOM_CAPACITY = 10;
 
-        Server server = new Server(DEFAULT_PORT);
+        Server server = new Server(MESSAGE_PORT, DATA_PORT);
         server.accept();
     }
 }

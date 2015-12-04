@@ -8,12 +8,14 @@ import java.net.Socket;
  */
 class ClientHandler extends Thread {
     private Socket socket = null;
+    private Socket dataSocket = null;
     private ReaderWriter readerWriter = null;
     private RoomManager roomManager = null;
     private String nickname = null; // unique 하면 좋지만 그건 DB에 저장할 때 처리될 부분이라 생각하여 패스.
 
-    ClientHandler(Socket socket) throws IOException {
+    ClientHandler(Socket socket, Socket dataSocket) throws IOException {
         this.socket = socket;
+        this.dataSocket = dataSocket;
         readerWriter = new ReaderWriter();
         readerWriter.open(socket);
     }
@@ -34,7 +36,6 @@ class ClientHandler extends Thread {
                 System.out.println(nickname + " is disconnected.");
                 break;
             }
-
         }
     }
 
@@ -63,6 +64,7 @@ class ClientHandler extends Thread {
     void close() {
         try {
             socket.close();
+            dataSocket.close();
             readerWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
