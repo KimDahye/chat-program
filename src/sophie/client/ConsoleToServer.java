@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 /**
  * Created by sophie on 2015. 11. 16..
+ * 클라이언트 규칙 handling
  */
 class ConsoleToServer extends Thread {
 

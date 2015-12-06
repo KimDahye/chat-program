@@ -13,10 +13,7 @@ class Client {
     private Socket socket = null;
     private ExecutorService executor = null;
     private static final int THREAD_NUMBER = 2;
-
-
     private static final String END_MESSAGE = ".bye";
-
 
     Client(String serverName, int serverPort) {
         try {
@@ -38,6 +35,8 @@ class Client {
     }
 
     void handle(String serverMsg) throws IOException {
+
+
         if (serverMsg.equals(END_MESSAGE)) {
             System.out.println("Good Bye~!");
             closeAllResources();

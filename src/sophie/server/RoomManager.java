@@ -1,5 +1,8 @@
 package sophie.server;
 
+import sophie.model.Message;
+import sophie.model.MessageType;
+
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,11 +13,8 @@ import java.util.concurrent.Executors;
 class RoomManager {
     private Room room;
     private ArrayList<ClientHandler> clients = null;
-    private FileReceiverSender fileReceiverSender = null;
     private ExecutorService executor = null;
     private int roomCapacity = 0;
-    private static final String END_MESSAGE = ".bye";
-    private static final String DATA_MESSAGE = ".file";
 
     RoomManager(int roomNumber, String roomName, int maxThreadNum) {
         this.room = new Room(roomNumber, roomName);
@@ -26,7 +26,8 @@ class RoomManager {
     void addClient(ClientHandler clientHandler) {
         if (clients.size() < roomCapacity) {
             clients.add(clientHandler);
-            clientHandler.send("Room" + room + "에 입장하셨습니다.");
+            String msg = "Room" + room + "에 입장하셨습니다.";
+            clientHandler.sendMessage(new Message(MessageType.CHAT, msg.getBytes()));
             executor.execute(clientHandler);
             clientHandler.setRoomManager(this);
             return;
@@ -34,34 +35,31 @@ class RoomManager {
         //TODO. room capacity 초과 에러 처리
     }
 
-    void handle(ClientHandler clientHandler, String msg) {
-        //TODO. 각 역할에 따라 인터페이스로 뽑고 추상화해서 돌리자!
-        if (msg.equals(END_MESSAGE)) {
-            clientHandler.sendBye(END_MESSAGE);
-            clientHandler.close();
-            remove(findClientIndex(clientHandler));
-        } else if (msg.startsWith(DATA_MESSAGE)){
-            String fileName = msg.split(" ")[1];
-            fileReceiverSender = new FileReceiverSender(clients, clientHandler);
-            executor.execute(fileReceiverSender);
-        } else {
+    void handle(ClientHandler clientHandler, MessageType contentType, byte[] body) {
+        if (contentType == contentType.CHAT) {
             for (ClientHandler c : clients) {
-                if (c != null) c.send(clientHandler.getNickname() + ": " + msg);
+                if (c != null) c.sendMessage(new Message(contentType, c.getBodyWithNickname(body)));
+            }
+        } else if (contentType == contentType.FILE) {
+            for (ClientHandler c : clients) {
+                if (c != clientHandler) c.sendMessage(new Message(contentType, body));
             }
         }
     }
 
-    void remove(int index) {
-        //synchronized 키워드... 필요 없겠지?
-        ClientHandler toTerminate = clients.get(index);
+    void remove(ClientHandler clientHandler) {
+        int index = findClientIndex(clientHandler);
+        if(index == -1) return;
         clients.remove(index);
-        toTerminate.close();
-        toTerminate.interrupt();
+        String msg = "---- " + clientHandler.getNickname() + " 님이 방을 나갔습니다. ----";
+        for(ClientHandler c : clients) {
+            c.sendMessage(new Message(MessageType.CHAT, msg.getBytes()));
+        }
     }
 
-    String getAvailableRoomInfo(){
+    String getAvailableRoomInfo() {
         //방이 full이 아니면 room 정보를 리턴해준다.
-        if(clients.size() < roomCapacity){
+        if (clients.size() < roomCapacity) {
             return room.toString();
         }
         return null;

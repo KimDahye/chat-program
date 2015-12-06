@@ -12,7 +12,6 @@ import java.util.concurrent.Executors;
  */
 class Server {
     private ServerSocket listener = null;
-    private ServerSocket dataListener = null;
     private RoomListManager roomListManager = null;
     private ExecutorService executor = null;
     private static final int MAX_THREAD_NUM = 100; //RoomSelector Thread 개수
@@ -21,9 +20,7 @@ class Server {
         try {
             System.out.println("Binding to port " + messagePort + ", please wait  ...");
             listener = new ServerSocket(messagePort);
-            dataListener = new ServerSocket(dataPort);
             System.out.println("Server started: " + listener);
-            System.out.println("Data socket starated:" + dataListener);
             roomListManager = RoomListManager.getInstance();
             executor = Executors.newFixedThreadPool(MAX_THREAD_NUM);
         } catch (IOException e) {
@@ -36,8 +33,7 @@ class Server {
         while (true) {
             try {
                 Socket client = listener.accept();
-                Socket dataSocket = dataListener.accept();
-                ClientHandler clientHandler = new ClientHandler(client, dataSocket);
+                ClientHandler clientHandler = new ClientHandler(client);
                 executor.execute(new RoomSelector(clientHandler, roomListManager));
             } catch (IOException e) {
                 e.printStackTrace();

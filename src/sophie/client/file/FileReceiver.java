@@ -1,4 +1,4 @@
-package sophie.client;
+package sophie.client.file;
 
 import java.io.*;
 import java.net.Socket;

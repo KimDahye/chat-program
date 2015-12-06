@@ -16,10 +16,6 @@ class Room {
         return number;
     }
 
-    String getName() {
-        return name;
-    }
-
     @Override
     public String toString() {
         return "Room{" +

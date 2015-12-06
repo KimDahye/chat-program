@@ -7,6 +7,7 @@ import java.net.Socket;
 
 /**
  * Created by sophie on 2015. 11. 16..
+ * 서버와의 프로토콜 핸들링
  */
 class ServerToConsole extends Thread{
     Client handler = null;
