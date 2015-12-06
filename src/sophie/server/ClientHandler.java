@@ -42,7 +42,6 @@ class ClientHandler extends Thread {
             try {
                 dispatchRequest();
             } catch (IOException e) {
-                e.printStackTrace();
                 closeAll();
                 roomManager.remove(this);
                 System.out.println(nickname + " is disconnected.");

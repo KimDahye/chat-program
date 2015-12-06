@@ -1,6 +1,10 @@
 package sophie.client;
 
+import sophie.model.Message;
+import sophie.model.MessageType;
+
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -10,39 +14,45 @@ import java.net.Socket;
  * 서버와의 프로토콜 핸들링
  */
 class ServerToConsole extends Thread{
-    Client handler = null;
-    private BufferedReader reader = null;
+    private DataInputStream dis = null;
+    private ServerToConsoleHandler handler = null;
 
-    ServerToConsole(Client handler, Socket socket) {
-        try {
-            this.handler = handler;
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    ServerToConsole(DataInputStream dis, ServerToConsoleHandler handler) {
+        this.dis = dis;
+        this.handler = handler;
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                String serverMsg = reader.readLine();
-                System.out.println(serverMsg);
-                handler.handle(serverMsg);
+                Message message = getMessage();
+                handler.handle(message);
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                //ioe.printStackTrace();
+                close();
+                break;
             }
         }
     }
 
-    @Override
-    public void interrupt() {
-        try {
-            reader.close();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } finally {
-            super.interrupt();
-        }
+    Message getMessage() throws IOException{
+        //TODO. 이 부분 util로 뺄 수 있지 않을까?
+        //header 분석
+        int type = dis.readInt();
+        int length = dis.readInt();
+
+        //body
+        byte[] body = new byte[length];
+        dis.read(body, 0, length);
+        return new Message(MessageType.fromInteger(type), body);
     }
+
+   void close() {
+       try {
+           if(dis != null) dis.close();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+   }
 }

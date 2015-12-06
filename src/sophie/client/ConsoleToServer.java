@@ -1,40 +1,37 @@
 package sophie.client;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
+import sophie.client.exception.ClientEndException;
+
 import java.util.Scanner;
 
 /**
  * Created by sophie on 2015. 11. 16..
- * 클라이언트 규칙 handling
  */
-class ConsoleToServer extends Thread {
+class ConsoleToServer implements Runnable{
+    private Scanner scanner = null;
+    private ConsoleMessageHandler handler = null;
+    private Client client = null;
 
-    private Scanner scanner = new Scanner(System.in);
-    private PrintWriter writer = null;
-
-    ConsoleToServer(Socket socket) {
-        try {
-            writer = new PrintWriter(socket.getOutputStream(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    ConsoleToServer(ConsoleMessageHandler handler, Client client) {
+        scanner = new Scanner(System.in);
+        this.handler = handler;
+        this.client = client;
     }
 
     @Override
     public void run() {
         while (true) {
-
-            writer.println(scanner.nextLine());
+            try {
+                handler.handle(scanner.nextLine());
+            } catch (ClientEndException e) {
+                client.closeAllResources();
+                break;
+            }
         }
     }
 
-    @Override
-    public void interrupt() {
+    void close() {
         scanner.close();
-        writer.close();
-        super.interrupt();
+        handler.close();
     }
-
 }

@@ -1,6 +1,6 @@
 package sophie.client;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
@@ -11,9 +11,11 @@ import java.util.concurrent.Executors;
  */
 class Client {
     private Socket socket = null;
+    private ConsoleToServer consoleToServer = null;
+    private ServerToConsole serverToConsole = null;
+
     private ExecutorService executor = null;
     private static final int THREAD_NUMBER = 2;
-    private static final String END_MESSAGE = ".bye";
 
     Client(String serverName, int serverPort) {
         try {
@@ -30,22 +32,34 @@ class Client {
     }
 
     void operate() {
-        executor.execute(new Thread(new ConsoleToServer(socket)));
-        executor.execute(new Thread(new ServerToConsole(this, socket)));
-    }
-
-    void handle(String serverMsg) throws IOException {
-
-
-        if (serverMsg.equals(END_MESSAGE)) {
-            System.out.println("Good Bye~!");
+        OutputStream out = null;
+        InputStream in = null;
+        try {
+            out = socket.getOutputStream();
+            in = socket.getInputStream();
+        }catch (IOException e){
+            e.printStackTrace();
             closeAllResources();
+            return;
         }
+
+        ConsoleMessageHandler consoleMessageHandler = new ConsoleMessageHandler(new DataOutputStream(out));
+        consoleToServer = new ConsoleToServer(consoleMessageHandler, this);
+        serverToConsole = new ServerToConsole(new DataInputStream(in), new ServerToConsoleHandler());
+
+        executor.execute(consoleToServer);
+        executor.execute(serverToConsole);
     }
 
-    void closeAllResources() throws IOException {
-        executor.shutdown(); //ThreadPoolExecution 의 shutdown 메소드에서 큐에 있는 Thread를 interrupt 하니깐 override 된 interrupt 메소드가 잘 불릴 것이라 예상함.
-        socket.close();
+    void closeAllResources() {
+        consoleToServer.close();
+        serverToConsole.close();
+        executor.shutdown();
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.exit(0);
     }
 
