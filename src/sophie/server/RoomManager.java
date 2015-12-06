@@ -37,8 +37,9 @@ class RoomManager {
 
     void handle(ClientHandler clientHandler, MessageType contentType, byte[] body) {
         if (contentType == contentType.CHAT) {
+            byte[] bodyWithNickname = clientHandler.getBodyWithNickname(body);
             for (ClientHandler c : clients) {
-                if (c != null) c.sendMessage(new Message(contentType, c.getBodyWithNickname(body)));
+                if (c != null) c.sendMessage(new Message(contentType, bodyWithNickname));
             }
         } else if (contentType == contentType.FILE) {
             for (ClientHandler c : clients) {
