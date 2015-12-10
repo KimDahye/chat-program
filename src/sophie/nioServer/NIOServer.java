@@ -102,10 +102,10 @@ public class NIOServer {
             ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
             do {
                 typeCount = typeCount + socketChannel.read(typeBuffer);
-            } while(typeCount != 4);
+            } while(typeCount < 4);
             do {
                 lengthCount = lengthCount + socketChannel.read(lengthBuffer);
-            } while(lengthCount != 4);
+            } while(lengthCount < 4);
             System.out.println(lengthBuffer);
 //            byte[] tmp = new byte[4];
             lengthBuffer.flip();
