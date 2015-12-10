@@ -2,6 +2,7 @@ package sophie.client;
 
 import sophie.model.Message;
 import sophie.model.MessageType;
+import sophie.utils.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -26,7 +27,7 @@ class ServerToConsole extends Thread{
     public void run() {
         while (true) {
             try {
-                Message message = getMessage();
+                Message message = IOUtils.getMessage(dis);
                 handler.handle(message);
             } catch (IOException ioe) {
                 //ioe.printStackTrace();
@@ -34,18 +35,6 @@ class ServerToConsole extends Thread{
                 break;
             }
         }
-    }
-
-    Message getMessage() throws IOException{
-        //TODO. 이 부분 util로 뺄 수 있지 않을까?
-        //header 분석
-        int type = dis.readInt();
-        int length = dis.readInt();
-
-        //body
-        byte[] body = new byte[length];
-        dis.read(body, 0, length);
-        return new Message(MessageType.fromInteger(type), body);
     }
 
    void close() {

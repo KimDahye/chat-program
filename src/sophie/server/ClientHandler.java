@@ -2,6 +2,7 @@ package sophie.server;
 
 import sophie.model.Message;
 import sophie.model.MessageType;
+import sophie.utils.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -27,7 +28,6 @@ class ClientHandler extends Thread {
         this.roomManager = roomManager;
     }
 
-
     void setNickname(String nickname) {
         this.nickname = nickname;
     }
@@ -51,29 +51,17 @@ class ClientHandler extends Thread {
     }
 
     void dispatchRequest() throws IOException {
-        Message message = getMessage();
+        Message message = IOUtils.getMessage(dis);
         roomManager.handle(this, message.getMessageType(), message.getBody());
     }
 
-    Message getMessage() throws IOException{
-        //TODO. 이 부분 util로 뺄 수 있지 않을까? 클라이언트에서도 쓰니까.
-        //header 분석
-        int type = dis.readInt();
-        int length = dis.readInt();
-
-        //body
-        byte[] body = new byte[length];
-        dis.read(body, 0, length);
-        return new Message(MessageType.fromInteger(type), body);
-    }
-
+    //TODO. 이 부분 IOUtils 쓰도록 리팩토링.
     void sendMessage(Message message) {
         int typeValue = message.getMessageType().getValue();
         byte[] body = message.getBody();
 
         synchronized (dos){
             try {
-                //TODO. 이 부분 util로 뺄 수 있지 않을까? 클라이언트에서도 쓰니까.
                 dos.writeInt(typeValue);
                 dos.writeInt(body.length);
                 dos.write(body);
