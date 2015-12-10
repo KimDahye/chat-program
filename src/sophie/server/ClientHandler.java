@@ -55,6 +55,10 @@ class ClientHandler extends Thread {
         roomManager.handle(this, message.getMessageType(), message.getBody());
     }
 
+    Message getMessage() throws IOException {
+        return IOUtils.getMessage(dis);
+    }
+
     //TODO. 이 부분 IOUtils 쓰도록 리팩토링.
     void sendMessage(Message message) {
         int typeValue = message.getMessageType().getValue();
