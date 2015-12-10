@@ -16,7 +16,7 @@ class Server {
     private ExecutorService executor = null;
     private static final int MAX_THREAD_NUM = 100; //RoomSelector Thread 개수
 
-    Server(int messagePort, int dataPort) {
+    Server(int messagePort) {
         try {
             System.out.println("Binding to port " + messagePort + ", please wait  ...");
             listener = new ServerSocket(messagePort);
@@ -50,10 +50,9 @@ class Server {
 
     public static void main(String args[]) {
         final int MESSAGE_PORT = 9001;
-        final int DATA_PORT = 9002;
         //final int ROOM_CAPACITY = 10;
 
-        Server server = new Server(MESSAGE_PORT, DATA_PORT);
+        Server server = new Server(MESSAGE_PORT);
         server.accept();
     }
 }
