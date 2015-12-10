@@ -24,8 +24,8 @@ public class NIOServer {
     private LinkedList<SocketChannel> room = new LinkedList<SocketChannel>();
 
     // 재활용을 위한 버퍼들 - 제대로 동작 안해서 주석처리
-    //ByteBuffer typeBuffer = ByteBuffer.allocate(4);
-    //ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+    ByteBuffer typeBuffer = ByteBuffer.allocate(4);
+    ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
 
     /**
      * 서버소켓 생성, 셀렉터에 서버소켓 등록
@@ -98,8 +98,8 @@ public class NIOServer {
             int typeCount= 0;
             int lengthCount = 0;
             int contentCount = 0;
-            ByteBuffer typeBuffer = ByteBuffer.allocate(4);
-            ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+            typeBuffer = ByteBuffer.allocate(4);
+            lengthBuffer = ByteBuffer.allocate(4);
             do {
                 typeCount = typeCount + socketChannel.read(typeBuffer);
             } while(typeCount < 4);
@@ -107,10 +107,7 @@ public class NIOServer {
                 lengthCount = lengthCount + socketChannel.read(lengthBuffer);
             } while(lengthCount < 4);
             System.out.println(lengthBuffer);
-//            byte[] tmp = new byte[4];
             lengthBuffer.flip();
-//            lengthBuffer.get(tmp);
-//            int contentLength = CastUtils.byteArrayToInt(tmp);
             int contentLength = lengthBuffer.getInt();
             lengthBuffer.rewind();
             System.out.println(contentLength);
@@ -119,7 +116,7 @@ public class NIOServer {
                 contentCount = contentCount + socketChannel.read(contentBuffer);
             } while(contentCount != contentLength);
             broadcast(typeBuffer, lengthBuffer, contentBuffer);
-//            clearRecyclableBuffers(); //재활용하니까 제대로 동작하지 않아서 주석처리
+            clearRecyclableBuffers();
         } catch (IOException e) {
             try {
                 socketChannel.close();
@@ -156,20 +153,19 @@ public class NIOServer {
                 contentBuffer.rewind();
             }
         }
-
     }
 
     /*재활용 하니까 제대로 동작하지 않아서 주석처리*/
-//    private void clearRecyclableBuffers() {
-//        if (typeBuffer != null) {
-//            typeBuffer.clear();
-//            typeBuffer.flip();
-//        }
-//        if (lengthBuffer != null) {
-//            lengthBuffer.clear();
-//            lengthBuffer.flip();
-//        }
-//    }
+    private void clearRecyclableBuffers() {
+        if (typeBuffer != null) {
+            typeBuffer.clear();
+            typeBuffer.flip();
+        }
+        if (lengthBuffer != null) {
+            lengthBuffer.clear();
+            lengthBuffer.flip();
+        }
+    }
 
     /**
      * main
