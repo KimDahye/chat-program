@@ -1,7 +1,6 @@
 package sophie.server;
 
 import sophie.model.Message;
-import sophie.model.MessageType;
 import sophie.utils.IOUtils;
 
 import java.io.*;
@@ -32,7 +31,7 @@ class ClientHandler extends Thread {
         this.nickname = nickname;
     }
 
-    String getNickname(){
+    String getNickname() {
         return this.nickname;
     }
 
@@ -55,12 +54,16 @@ class ClientHandler extends Thread {
         roomManager.handle(this, message.getMessageType(), message.getBody());
     }
 
+    Message getMessage() throws IOException {
+        return IOUtils.getMessage(dis);
+    }
+
     //TODO. 이 부분 IOUtils 쓰도록 리팩토링.
     void sendMessage(Message message) {
         int typeValue = message.getMessageType().getValue();
         byte[] body = message.getBody();
 
-        synchronized (dos){
+        synchronized (dos) {
             try {
                 dos.writeInt(typeValue);
                 dos.writeInt(body.length);
@@ -69,13 +72,13 @@ class ClientHandler extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
                 closeAll();
-                if(roomManager != null) roomManager.remove(this);
+                if (roomManager != null) roomManager.remove(this);
             }
         }
     }
 
     byte[] getBodyWithNickname(byte[] body) {
-        return join((nickname+": ").getBytes(), body);
+        return join((nickname + ": ").getBytes(), body);
     }
 
     //org.apache.commons.lang3.ArrayUtils 의 addAll(first, second)이용하면 한 줄에 끝낼 수 있다.
@@ -83,18 +86,18 @@ class ClientHandler extends Thread {
     private byte[] join(byte[] arr1, byte[] arr2) {
         int size1 = arr1.length;
         int size2 = arr2.length;
-        byte[] newArr = new byte[size1+size2];
+        byte[] newArr = new byte[size1 + size2];
         System.arraycopy(arr1, 0, newArr, 0, size1);
         System.arraycopy(arr2, 0, newArr, size1, size2);
         return newArr;
     }
 
     private void closeAll() {
-        try{
-            if(dis != null) dis.close();
-            if(dos != null) dos.close();
-            if(socket != null) socket.close();
-        }catch (IOException e){
+        try {
+            if (dis != null) dis.close();
+            if (dos != null) dos.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
