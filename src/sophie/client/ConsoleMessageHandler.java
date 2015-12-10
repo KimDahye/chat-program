@@ -11,7 +11,7 @@ import java.io.IOException;
  * Created by sophie on 2015. 12. 7..
  * 클라이언트 프로그램 규칙 handling
  */
-public class ConsoleMessageHandler {
+class ConsoleMessageHandler {
     private DataOutputStream dos = null;
     private static final String END_COMMAND = ".bye";
     private static final String FILE_COMMAND = ".file";

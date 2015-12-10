@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Created by sophie on 2015. 12. 7..
  */
-public class ServerToConsoleHandler {
+class ServerToConsoleHandler {
     void handle(Message msg) {
         if (msg.getMessageType() == MessageType.CHAT) {
             System.out.println(new String(msg.getBody()));
