@@ -11,7 +11,7 @@ import java.io.IOException;
  * Created by sophie on 2015. 12. 7..
  * 클라이언트 프로그램 규칙 handling
  */
-public class ConsoleMessageHandler {
+class ConsoleMessageHandler {
     private DataOutputStream dos = null;
     private static final String END_COMMAND = ".bye";
     private static final String FILE_COMMAND = ".file";
@@ -29,12 +29,12 @@ public class ConsoleMessageHandler {
             String fileName = split[1];
             try {
                 IOUtils.sendFileMessage(dos, fileName);
+                System.out.println(fileName + " 파일을 전송하였습니다.");
             } catch (IOException e) {
-                e.getMessage();
+                System.out.println(e.getMessage());
             } catch (OutOfFileLengthLimitException e) {
-                e.getMessage();
+                System.out.println(e.getMessage());
             }
-            System.out.println(fileName + " 파일을 전송하였습니다.");
             return;
         }
         IOUtils.sendChatMessage(dos, msg);

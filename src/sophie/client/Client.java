@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by sophie on 2015. 11. 16..
  */
-class Client {
+public class Client {
     private Socket socket = null;
     private ConsoleToServer consoleToServer = null;
     private ServerToConsole serverToConsole = null;
