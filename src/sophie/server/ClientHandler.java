@@ -63,17 +63,12 @@ class ClientHandler extends Thread {
         int typeValue = message.getMessageType().getValue();
         byte[] body = message.getBody();
 
-        synchronized (dos) {
-            try {
-                dos.writeInt(typeValue);
-                dos.writeInt(body.length);
-                dos.write(body);
-                dos.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-                closeAll();
-                if (roomManager != null) roomManager.remove(this);
-            }
+        try {
+            IOUtils.sendMessage(dos, typeValue, body);
+        } catch (IOException e) {
+            //클라이언트 접속 종료
+            closeAll();
+            if (roomManager != null) roomManager.remove(this);
         }
     }
 

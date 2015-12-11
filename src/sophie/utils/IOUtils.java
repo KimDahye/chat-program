@@ -20,23 +20,19 @@ public class IOUtils {
         dos.flush();
     }
 
-    public static void sendChatMessage(DataOutputStream dos, String msg) {
+    public static void sendChatMessage(DataOutputStream dos, String msg) throws IOException {
         int typeValue = MessageType.CHAT.getValue();
         byte[] body = msg.getBytes();
-        try {
-            sendMessage(dos, typeValue, body);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendMessage(dos, typeValue, body);
     }
 
     public static void sendFileMessage(DataOutputStream dos, String fileName) throws IOException, OutOfFileLengthLimitException {
         int typeValue = MessageType.FILE.getValue();
-        byte [] body = FileUtils.getBytesFromFile(new File(fileName));
+        byte[] body = FileUtils.getBytesFromFile(new File(fileName));
         sendMessage(dos, typeValue, body);
     }
 
-    public static Message getMessage(DataInputStream dis) throws IOException{
+    public static Message getMessage(DataInputStream dis) throws IOException {
         //header 분석
         int type = dis.readInt();
         int length = dis.readInt();
