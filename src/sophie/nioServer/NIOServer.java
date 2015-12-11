@@ -98,8 +98,6 @@ public class NIOServer {
             int typeCount= 0;
             int lengthCount = 0;
             int contentCount = 0;
-            typeBuffer = ByteBuffer.allocate(4);
-            lengthBuffer = ByteBuffer.allocate(4);
             do {
                 typeCount = typeCount + socketChannel.read(typeBuffer);
             } while(typeCount < 4);
@@ -159,11 +157,11 @@ public class NIOServer {
     private void clearRecyclableBuffers() {
         if (typeBuffer != null) {
             typeBuffer.clear();
-            typeBuffer.flip();
+            //typeBuffer.flip();
         }
         if (lengthBuffer != null) {
             lengthBuffer.clear();
-            lengthBuffer.flip();
+            //lengthBuffer.flip();
         }
     }
 
