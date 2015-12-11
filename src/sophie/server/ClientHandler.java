@@ -32,7 +32,7 @@ class ClientHandler extends Thread {
         this.nickname = nickname;
     }
 
-    String getNickname(){
+    String getNickname() {
         return this.nickname;
     }
 
@@ -64,22 +64,17 @@ class ClientHandler extends Thread {
         int typeValue = message.getMessageType().getValue();
         byte[] body = message.getBody();
 
-        synchronized (dos){
-            try {
-                dos.writeInt(typeValue);
-                dos.writeInt(body.length);
-                dos.write(body);
-                dos.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-                closeAll();
-                if(roomManager != null) roomManager.remove(this);
-            }
+        try {
+            IOUtils.sendMessage(dos, typeValue, body);
+        } catch (IOException e) {
+            //클라이언트 접속 종료
+            closeAll();
+            if (roomManager != null) roomManager.remove(this);
         }
     }
 
     byte[] getBodyWithNickname(byte[] body) {
-        return join((nickname+": ").getBytes(), body);
+        return join((nickname + ": ").getBytes(), body);
     }
 
     //org.apache.commons.lang3.ArrayUtils 의 addAll(first, second)이용하면 한 줄에 끝낼 수 있다.
@@ -87,18 +82,18 @@ class ClientHandler extends Thread {
     private byte[] join(byte[] arr1, byte[] arr2) {
         int size1 = arr1.length;
         int size2 = arr2.length;
-        byte[] newArr = new byte[size1+size2];
+        byte[] newArr = new byte[size1 + size2];
         System.arraycopy(arr1, 0, newArr, 0, size1);
         System.arraycopy(arr2, 0, newArr, size1, size2);
         return newArr;
     }
 
     private void closeAll() {
-        try{
-            if(dis != null) dis.close();
-            if(dos != null) dos.close();
-            if(socket != null) socket.close();
-        }catch (IOException e){
+        try {
+            if (dis != null) dis.close();
+            if (dos != null) dos.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

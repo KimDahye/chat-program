@@ -2,6 +2,7 @@ package sophie.client;
 
 import sophie.client.exception.ClientEndException;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -23,7 +24,11 @@ class ConsoleToServer implements Runnable{
         while (true) {
             try {
                 handler.handle(scanner.nextLine());
-            } catch (ClientEndException e) {
+            } catch (ClientEndException cee) {
+                client.closeAllResources();
+                break;
+            } catch (IOException ioe) {
+                System.out.println("서버와의 연결이 끊겼습니다.");
                 client.closeAllResources();
                 break;
             }

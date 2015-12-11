@@ -20,7 +20,7 @@ class ConsoleMessageHandler {
         this.dos = dos;
     }
 
-    void handle(String msg) throws ClientEndException {
+    void handle(String msg) throws ClientEndException, IOException {
         if (msg.equals(END_COMMAND)) {
             throw new ClientEndException();
         }
