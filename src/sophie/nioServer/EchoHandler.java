@@ -31,6 +31,8 @@ public class EchoHandler implements CompletionHandler<Integer, ByteBuffer> {
 
             //echo하기
             Future<Integer> w = channel.write(buffer);
+
+            //아래 부분은 write할 때 channel을 생성자에서 받는 CompletionHandler를 등록하여 비동기적으로 처리할 수 있다.
             try {
                 w.get(); //block
             } catch (InterruptedException e) {
