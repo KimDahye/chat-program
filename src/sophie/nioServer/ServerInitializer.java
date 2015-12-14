@@ -1,5 +1,9 @@
 package sophie.nioServer;
 
+import sophie.nioServer.eventHandler.ChatEventHandler;
+import sophie.nioServer.eventHandler.FileEventHandler;
+import sophie.nioServer.eventHandler.NioEventHandler;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousChannelGroup;
@@ -23,6 +27,7 @@ public class ServerInitializer {
         NioHandleMap handleMap = new NioHandleMap();
         NioEventHandler chatEventHandler = new ChatEventHandler();
         NioEventHandler fileEventHandler = new FileEventHandler();
+//        NioEventHandle
         handleMap.put(chatEventHandler.getType(), chatEventHandler);
         handleMap.put(fileEventHandler.getType(), fileEventHandler);
 

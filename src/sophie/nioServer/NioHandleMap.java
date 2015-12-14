@@ -1,5 +1,7 @@
 package sophie.nioServer;
 
+import sophie.nioServer.eventHandler.NioEventHandler;
+
 import java.util.HashMap;
 
 /**

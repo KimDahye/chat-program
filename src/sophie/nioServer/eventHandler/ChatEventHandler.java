@@ -1,11 +1,12 @@
-package sophie.nioServer;
+package sophie.nioServer.eventHandler;
 
-import jdk.management.resource.internal.inst.AsynchronousSocketChannelImplRMHooks;
 import sophie.model.MessageType;
+import sophie.nioServer.Demultiplexer;
+import sophie.nioServer.NioHandleMap;
 import sophie.utils.CastUtils;
+import sophie.utils.IOUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Arrays;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 /**
  * Created by sophie on 2015. 12. 14..
  */
-public class ChatEventHandler implements NioEventHandler{
+public class ChatEventHandler implements NioEventHandler {
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
     private static final int CHAT_TYPE = MessageType.CHAT.getValue();
@@ -52,9 +53,8 @@ public class ChatEventHandler implements NioEventHandler{
 
             // broadcasting
             // TODO. for 문이 들어가야 한다.
-            ByteBuffer writeBuffer = ByteBuffer.allocate(TYPE_SIZE+LENGTH_DATA_SIZE+contentLength).putInt(CHAT_TYPE).putInt(contentLength).put(content.getBytes());
-            writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
-            channel.write(writeBuffer);
+            int bufferSize = TYPE_SIZE + LENGTH_DATA_SIZE + contentLength;
+            IOUtils.sendGeneralMessage(channel, bufferSize, CHAT_TYPE, contentLength, content.getBytes());
 
             // 다시 읽기 준비
             ByteBuffer newBuffer = ByteBuffer.allocate(TYPE_SIZE);

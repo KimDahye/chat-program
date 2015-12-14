@@ -1,13 +1,12 @@
 package sophie.nioServer;
 
+import sophie.nioServer.eventHandler.NioEventHandler;
 import sophie.utils.CastUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Created by sophie on 2015. 12. 13..

@@ -1,4 +1,6 @@
-package sophie.nioServer;
+package sophie.nioServer.eventHandler;
+
+import sophie.nioServer.NioHandleMap;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;

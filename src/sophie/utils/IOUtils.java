@@ -8,11 +8,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousSocketChannel;
 
 /**
  * Created by sophie on 2015. 12. 10..
  */
 public class IOUtils {
+    //classic IO 관련 utils
     public static void sendMessage(DataOutputStream dos, int typeValue, byte[] body) throws IOException {
         dos.writeInt(typeValue);
         dos.writeInt(body.length);
@@ -43,4 +46,22 @@ public class IOUtils {
         dis.read(body, 0, length);
         return new Message(MessageType.fromInteger(type), body);
     }
+
+    //NIO 관련 utils
+    public static void sendGeneralMessage(AsynchronousSocketChannel channel, int bufferSize, int type, int contentLength, byte[] content) {
+        ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(type).putInt(contentLength).put(content);
+        writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
+        channel.write(writeBuffer);
+    }
+
+    public static void sendGeneralMessage(AsynchronousSocketChannel channel, Message message) {
+        int bodyLength = message.getBodyLength();
+        int bufferSize = message.getHeaderLength() + bodyLength;
+        int type = message.getType().value();
+
+        ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(type).putInt(bodyLength).put(message.getBody());
+        writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
+        channel.write(writeBuffer);
+    }
+
 }
