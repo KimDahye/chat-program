@@ -16,11 +16,11 @@ import java.util.Arrays;
 /**
  * Created by sophie on 2015. 12. 14..
  */
-public class UserNameEventHandler implements NioEventHandler{
-    private static final String INFO_MESSAGE_NO_ROOM = "There is no room. You should make the first room!";
-    private static final String ASKING_MESSAGE_MAKING = "Do you wanna make room? (yes/any key)";
+public class RoomMakingEventHandler implements NioEventHandler {
     private static final String CLIENT_MESSAGE_WANT_TO_MAKE_ROOM = "yes";
     private static final String ASKING_MESSAGE_ROOM_NAME = "Type the room name you want to make: ";
+    private static final String ASKING_MESSAGE_ROOM_NUMBER = "Enter room number if you want to participate: ";
+
 
     private static final MessageType TYPE = MessageType.USER_NAME;
     private static final int TYPE_AS_INT = TYPE.getValue();
@@ -58,24 +58,17 @@ public class UserNameEventHandler implements NioEventHandler{
             buffer.flip();
             byte[] bufferAsArray = buffer.array();
             int contentLength = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, 0, LENGTH_DATA_SIZE)); //TODO. 가독성 떨어지니 메소드로 분리해보자.
-            String userName = new String(Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength));
-            //TODO. userName save
+            String answer = new String(Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength));
 
-            Message infoMessage = null;
-            Message askingMessage = null;
-            if(roomList.isEmpty()) {
-                //방이 없다는 정보
-                infoMessage = new GeneralMessage(MessageType.INFO, INFO_MESSAGE_NO_ROOM.getBytes());
-                //새로 만들 방 이름을 묻는 질문
-                askingMessage = new GeneralMessage(MessageType.ROOM_NAME, ASKING_MESSAGE_ROOM_NAME.getBytes());
+            Message message = null;
+            if(answer.equals(CLIENT_MESSAGE_WANT_TO_MAKE_ROOM)) {
+                // 만들 방 이름 묻기
+                message = new GeneralMessage(MessageType.ROOM_NAME, ASKING_MESSAGE_ROOM_NAME.getBytes());
             } else {
-                // 이미 만들어진 방 정보
-                infoMessage = new GeneralMessage(MessageType.INFO, roomList.getRoomInfo());
-                // 방 만들 건지 묻는 질문
-                askingMessage = new GeneralMessage(MessageType.ROOM_MAKING, ASKING_MESSAGE_MAKING.getBytes());
+                //참가할 방 번호 묻기
+                message = new GeneralMessage(MessageType.ROOM_NUM, ASKING_MESSAGE_ROOM_NUMBER.getBytes());
             }
-            IOUtils.sendGeneralMessage(channel, infoMessage);
-            IOUtils.sendGeneralMessage(channel, askingMessage);
+            IOUtils.sendGeneralMessage(channel, message);
 
             // 다시 읽기 준비
             ByteBuffer newBuffer = ByteBuffer.allocate(TYPE_SIZE);

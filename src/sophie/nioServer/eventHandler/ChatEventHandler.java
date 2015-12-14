@@ -18,8 +18,8 @@ public class ChatEventHandler implements NioEventHandler {
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
     private static final int CHAT_TYPE = MessageType.CHAT.getValue();
-    AsynchronousSocketChannel channel;
-    NioHandleMap handleMap;
+    private AsynchronousSocketChannel channel;
+    private NioHandleMap handleMap;
 
     //TODO. cliet list 들고 있어야 한다. 싱글톤 레퍼런스.
 

@@ -4,7 +4,7 @@ package sophie.model;
  * Created by sophie on 2015. 12. 7..
  */
 public enum MessageType {
-    CHAT(0), FILE(1), USER_NAME(2), ROOM_MAKING(3), ROOM_NAME(4), ROOM_NUM(5);
+    CHAT(0), FILE(1), USER_NAME(2), ROOM_MAKING(3), ROOM_NAME(4), ROOM_NUM(5), INFO(6);
 
     private final int value;
     MessageType(int value) {
@@ -29,6 +29,8 @@ public enum MessageType {
                 return ROOM_NAME;
             case 5:
                 return ROOM_NUM;
+            case 6:
+                return INFO;
         }
         return null;
     }
