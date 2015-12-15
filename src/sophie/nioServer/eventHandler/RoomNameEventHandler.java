@@ -1,9 +1,13 @@
 package sophie.nioServer.eventHandler;
 
+import sophie.model.GeneralMessage;
+import sophie.model.Message;
 import sophie.model.MessageType;
 import sophie.nioServer.Demultiplexer;
+import sophie.nioServer.ProtocolString;
 import sophie.nioServer.RoomListManager;
 import sophie.utils.CastUtils;
+import sophie.utils.IOUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,8 +18,6 @@ import java.util.Arrays;
  * Created by sophie on 2015. 12. 14..
  */
 class RoomNameEventHandler implements NioEventHandler {
-    private static final MessageType TYPE = MessageType.ROOM_NAME;
-    private static final int TYPE_AS_INT = TYPE.getValue();
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
 
@@ -48,6 +50,9 @@ class RoomNameEventHandler implements NioEventHandler {
             String roomName = new String(Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength));
 
             roomListManager.makeRoom(roomName, channel);
+            Message message = new GeneralMessage(MessageType.CHAT_START, ProtocolString.INFO_MESSAGE_ROOM_PARTICIPATE.getBytes());
+            IOUtils.sendGeneralMessage(channel, message);
+
             // 다시 읽기 준비
             ByteBuffer newBuffer = ByteBuffer.allocate(TYPE_SIZE);
             channel.read(newBuffer, newBuffer, new Demultiplexer(channel));

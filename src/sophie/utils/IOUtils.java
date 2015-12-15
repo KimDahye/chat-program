@@ -48,6 +48,16 @@ public class IOUtils {
         return new GeneralMessage(MessageType.fromInteger(type), body);
     }
 
+    public static void sendGeneralMessage(DataOutputStream dos, Message message) throws IOException {
+        int typeValue = message.getMessageType().getValue();
+        byte[] body = message.getBody();
+
+        dos.writeInt(typeValue);
+        dos.writeInt(body.length);
+        dos.write(body);
+        dos.flush();
+    }
+
     public static void sendGeneralMessage(AsynchronousSocketChannel channel, Message message) {
         int bodyLength = message.getBodyLength();
         int bufferSize = message.getHeaderLength() + bodyLength;

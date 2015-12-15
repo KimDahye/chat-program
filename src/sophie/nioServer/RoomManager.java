@@ -4,7 +4,6 @@ import sophie.model.GeneralMessage;
 import sophie.model.MessageType;
 import sophie.utils.IOUtils;
 
-import java.nio.channels.AsynchronousChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 

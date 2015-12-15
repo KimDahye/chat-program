@@ -45,7 +45,7 @@ class ChatEventHandler implements NioEventHandler {
 
             // broadcasting
             // TODO. for 문이 들어가야 한다.
-            content = roomListManager.getClientName(channel) + content;
+            content = roomListManager.getClientName(channel) + ": " + content;
             roomListManager.broadcast(channel, content);
 
             // 다시 읽기 준비

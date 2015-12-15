@@ -1,5 +1,6 @@
 package sophie.server;
 
+import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
 
@@ -48,7 +49,7 @@ class RoomSelector implements Runnable {
     }
 
     private String ask(String query){
-        clientHandler.sendMessage(new Message(MessageType.CHAT, query.getBytes()));
+        clientHandler.sendMessage(new GeneralMessage(MessageType.CHAT, query.getBytes()));
         return getMessage();
     }
 
@@ -73,7 +74,7 @@ class RoomSelector implements Runnable {
     }
 
     private void send(String msg) {
-        clientHandler.sendMessage(new Message(MessageType.CHAT, msg.getBytes()));
+        clientHandler.sendMessage(new GeneralMessage(MessageType.CHAT, msg.getBytes()));
     }
 
     private void sendRoomInfo() {

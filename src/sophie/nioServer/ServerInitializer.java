@@ -1,8 +1,5 @@
 package sophie.nioServer;
 
-import sophie.nioServer.eventHandler.*;
-import sophie.server.RoomListManager;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousChannelGroup;

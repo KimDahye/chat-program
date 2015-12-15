@@ -4,6 +4,7 @@ import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
 import sophie.nioServer.Demultiplexer;
+import sophie.nioServer.ProtocolString;
 import sophie.nioServer.RoomListManager;
 import sophie.utils.CastUtils;
 import sophie.utils.IOUtils;
@@ -17,10 +18,6 @@ import java.util.Arrays;
  * Created by sophie on 2015. 12. 14..
  */
 class RoomNumberEventHandler implements NioEventHandler{
-    private static final String INFO_MESSAGE_INVALID_ROOM_NUMBER = "올바른 방 번호가 아닙니다.";
-    private static final String INFO_MESSAGE_ROOM_PARTICIPATE = "------- 방에 참가하였습니다 ---------";
-    private static final String ASKING_MESSAGE_ROOM_NUMBER = "Enter room number if you want to participate: ";
-
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020;
 
@@ -57,9 +54,9 @@ class RoomNumberEventHandler implements NioEventHandler{
             Message message;
             if(isPassable) {
                 roomListManager.participateRoomAt(roomNumber, channel);
-                message = new GeneralMessage(MessageType.INFO, INFO_MESSAGE_ROOM_PARTICIPATE.getBytes());
+                message = new GeneralMessage(MessageType.CHAT_START, ProtocolString.INFO_MESSAGE_ROOM_PARTICIPATE.getBytes());
             } else {
-                String content = INFO_MESSAGE_INVALID_ROOM_NUMBER + '\n' + ASKING_MESSAGE_ROOM_NUMBER;
+                String content = ProtocolString.INFO_MESSAGE_INVALID_ROOM_NUMBER + '\n' + ProtocolString.ASKING_MESSAGE_ROOM_NUMBER;
                 message = new GeneralMessage(MessageType.ROOM_NUM, content.getBytes());
             }
             IOUtils.sendGeneralMessage(channel, message);

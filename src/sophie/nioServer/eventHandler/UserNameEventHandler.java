@@ -4,6 +4,7 @@ import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
 import sophie.nioServer.Demultiplexer;
+import sophie.nioServer.ProtocolString;
 import sophie.nioServer.RoomListManager;
 import sophie.utils.CastUtils;
 import sophie.utils.IOUtils;
@@ -17,10 +18,6 @@ import java.util.Arrays;
  * Created by sophie on 2015. 12. 14..
  */
 class UserNameEventHandler implements NioEventHandler{
-    private static final String INFO_MESSAGE_NO_ROOM = "There is no room. You should make the first room!";
-    private static final String ASKING_MESSAGE_MAKING = "Do you wanna make room? (yes/any key)";
-    private static final String ASKING_MESSAGE_ROOM_NAME = "Type the room name you want to make: ";
-
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
     AsynchronousSocketChannel channel;
@@ -58,14 +55,14 @@ class UserNameEventHandler implements NioEventHandler{
             Message askingMessage;
             if(roomListManager.isRoomListEmpty()) {
                 //방이 없다는 정보
-                infoMessage = new GeneralMessage(MessageType.INFO, INFO_MESSAGE_NO_ROOM.getBytes());
+                infoMessage = new GeneralMessage(MessageType.INFO, ProtocolString.INFO_MESSAGE_NO_ROOM.getBytes());
                 //새로 만들 방 이름을 묻는 질문
-                askingMessage = new GeneralMessage(MessageType.ROOM_NAME, ASKING_MESSAGE_ROOM_NAME.getBytes());
+                askingMessage = new GeneralMessage(MessageType.ROOM_NAME, ProtocolString.ASKING_MESSAGE_ROOM_NAME.getBytes());
             } else {
                 // 이미 만들어진 방 정보
                 infoMessage = new GeneralMessage(MessageType.INFO, roomListManager.getAvailableRoomInfoList().getBytes());
                 // 방 만들 건지 묻는 질문
-                askingMessage = new GeneralMessage(MessageType.ROOM_MAKING, ASKING_MESSAGE_MAKING.getBytes());
+                askingMessage = new GeneralMessage(MessageType.ROOM_MAKING, ProtocolString.ASKING_MESSAGE_MAKING.getBytes());
             }
             IOUtils.sendGeneralMessage(channel, infoMessage);
             IOUtils.sendGeneralMessage(channel, askingMessage);

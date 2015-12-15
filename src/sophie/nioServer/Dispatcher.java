@@ -3,7 +3,6 @@ package sophie.nioServer;
 import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
-import sophie.server.RoomListManager;
 import sophie.utils.IOUtils;
 
 import java.nio.ByteBuffer;
@@ -16,13 +15,12 @@ import java.nio.channels.CompletionHandler;
  */
 public class Dispatcher implements CompletionHandler<AsynchronousSocketChannel, AsynchronousServerSocketChannel> {
     private static final int HEADER_TYPE_SIZE = 4;
-    private static final String ASKING_MESSAGE_USERNAME = "Enter your name: ";
 
     public void completed(AsynchronousSocketChannel channel, AsynchronousServerSocketChannel listener) {
         listener.accept(listener, this);
 
         // USER_NAME 물어본다.
-        Message message = new GeneralMessage(MessageType.USER_NAME, ASKING_MESSAGE_USERNAME.getBytes());
+        Message message = new GeneralMessage(MessageType.USER_NAME, ProtocolString.ASKING_MESSAGE_USERNAME.getBytes());
         IOUtils.sendGeneralMessage(channel, message);
 
         // 응답에 대한 핸들러 등록

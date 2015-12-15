@@ -11,6 +11,8 @@ import java.util.concurrent.Executors;
  */
 public class Client {
     private Socket socket = null;
+    private DataOutputStream dos;
+    private DataInputStream dis;
     private ConsoleToServer consoleToServer = null;
     private ServerToConsole serverToConsole = null;
 
@@ -42,12 +44,11 @@ public class Client {
             closeAllResources();
             return;
         }
-
-        ConsoleMessageHandler consoleMessageHandler = new ConsoleMessageHandler(new DataOutputStream(out));
+        dos = new DataOutputStream(out);
+        dis = new DataInputStream(in);
+        ConsoleMessageHandler consoleMessageHandler = new ConsoleMessageHandler(dos);
         consoleToServer = new ConsoleToServer(consoleMessageHandler, this);
-        serverToConsole = new ServerToConsole(new DataInputStream(in), new ServerToConsoleHandler());
-
-        executor.execute(consoleToServer);
+        serverToConsole = new ServerToConsole(dis, new ServerToConsoleHandler(executor, consoleToServer, dos));
         executor.execute(serverToConsole);
     }
 
@@ -56,6 +57,8 @@ public class Client {
         serverToConsole.close();
         executor.shutdown();
         try {
+            dos.close();
+            dis.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
