@@ -3,11 +3,13 @@ package sophie.utils;
 import sophie.client.exception.OutOfFileLengthLimitException;
 
 import java.io.*;
+import java.util.UUID;
 
 /**
  * Created by sophie on 2015. 12. 10..
  */
 public class FileUtils {
+    private static String uuid = UUID.randomUUID().toString().split("-")[0];
     private static int downloadCount = 1;
 
     //TODO. Maven 적용하면 commons.apache 에서 toByteArray 사용하자.
@@ -44,7 +46,7 @@ public class FileUtils {
     public static void saveFile(byte[] body) {
         try {
             //TODO. 프로토콜에 파일네임 넣는 게 없어서 일단 파일네임은 임의로 정한다. 수정해야 할 부분.
-            String fileName = "download" + (downloadCount++) + ".txt";
+            String fileName = uuid + "download" + (downloadCount++) + ".txt";
 
             // 파일을 생성하고 파일에 대한 출력 스트림 생성
             File file = new File(fileName);

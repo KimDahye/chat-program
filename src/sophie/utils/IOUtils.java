@@ -37,7 +37,6 @@ public class IOUtils {
         sendMessage(dos, typeValue, body);
     }
 
-
     public static Message getMessage(DataInputStream dis) throws IOException {
         //header 분석
         int type = dis.readInt();

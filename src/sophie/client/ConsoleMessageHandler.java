@@ -29,12 +29,12 @@ class ConsoleMessageHandler {
             String fileName = split[1];
             try {
                 IOUtils.sendFileMessage(dos, fileName);
+                System.out.println(fileName + " 파일을 전송하였습니다.");
             } catch (IOException e) {
-                e.getMessage();
+                System.out.println(e.getMessage());
             } catch (OutOfFileLengthLimitException e) {
-                e.getMessage();
+                System.out.println(e.getMessage());
             }
-            System.out.println(fileName + " 파일을 전송하였습니다.");
             return;
         }
         IOUtils.sendChatMessage(dos, msg);

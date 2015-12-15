@@ -1,7 +1,6 @@
 package sophie.server;
 
 import sophie.model.Message;
-import sophie.model.MessageType;
 import sophie.utils.IOUtils;
 
 import java.io.*;
