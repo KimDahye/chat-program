@@ -51,6 +51,7 @@ public class RoomListManager {
 
     public void participateRoomAt(int roomNum, AsynchronousSocketChannel channel) {
         roomList.get(roomNum).addClient(channel);
+        saveClientRoomNumber(channel, roomNum);
     }
 
     public boolean isRoomListEmpty(){

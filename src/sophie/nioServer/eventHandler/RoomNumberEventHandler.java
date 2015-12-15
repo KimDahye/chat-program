@@ -47,10 +47,20 @@ class RoomNumberEventHandler implements NioEventHandler{
             buffer.flip();
             byte[] bufferAsArray = buffer.array();
             int contentLength = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, 0, LENGTH_DATA_SIZE)); //TODO. 가독성 떨어지니 메소드로 분리해보자.
-            int roomNumber = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength));
+            String roomNumString = new String(Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength));
 
-            boolean isPassable = roomListManager.isExistentRoomNumber(roomNumber);
+            //String을 integer로 parsing
+            int roomNumber = 0;
+            boolean isPassable;
+            try {
+                roomNumber = Integer.parseInt(roomNumString);
+                isPassable = roomListManager.isExistentRoomNumber(roomNumber);
+            }
+            catch (NumberFormatException e){
+                isPassable = false;
+            }
 
+            //isPassable 값에 따라 분기
             Message message;
             if(isPassable) {
                 roomListManager.participateRoomAt(roomNumber, channel);
