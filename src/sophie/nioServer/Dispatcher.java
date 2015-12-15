@@ -20,7 +20,7 @@ public class Dispatcher implements CompletionHandler<AsynchronousSocketChannel, 
         listener.accept(listener, this);
 
         // USER_NAME 물어본다.
-        Message message = new GeneralMessage(MessageType.USER_NAME, ProtocolString.ASKING_MESSAGE_USERNAME.getBytes());
+        GeneralMessage message = new GeneralMessage(MessageType.USER_NAME, ProtocolString.ASKING_MESSAGE_USERNAME.getBytes());
         IOUtils.sendGeneralMessage(channel, message);
 
         // 응답에 대한 핸들러 등록

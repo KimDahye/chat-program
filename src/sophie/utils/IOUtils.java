@@ -1,6 +1,7 @@
 package sophie.utils;
 
 import sophie.client.exception.OutOfFileLengthLimitException;
+import sophie.model.FileMessage;
 import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
@@ -58,7 +59,7 @@ public class IOUtils {
         dos.flush();
     }
 
-    public static void sendGeneralMessage(AsynchronousSocketChannel channel, Message message) {
+    public static void sendGeneralMessage(AsynchronousSocketChannel channel, GeneralMessage message) {
         int bodyLength = message.getBodyLength();
         int bufferSize = message.getHeaderLength() + bodyLength;
         int typeValue = message.getMessageType().getValue();
@@ -66,5 +67,20 @@ public class IOUtils {
         ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(typeValue).putInt(bodyLength).put(message.getBody());
         writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
         channel.write(writeBuffer);
+    }
+
+    public static void sendFileMessage(AsynchronousSocketChannel channel, FileMessage message) {
+        //TODO. TYPE, FileNameLength, FileExtLength, FileContentLength
+        int bodyLength = message.getBodyLength();
+        int bufferSize = message.getHeaderLength() + bodyLength;
+        int typeValue = message.getMessageType().getValue();
+
+        ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(typeValue).putInt(bodyLength).put(message.getBody());
+        writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
+        channel.write(writeBuffer);
+    }
+
+    public static void sendMessage(AsynchronousSocketChannel channel, Message message) {
+        //여기서 message  type에 따라 sendGeneralMessage, sendFileMessage 부르도록 하자.
     }
 }

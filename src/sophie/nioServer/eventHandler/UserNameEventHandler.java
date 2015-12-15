@@ -20,8 +20,8 @@ import java.util.Arrays;
 class UserNameEventHandler implements NioEventHandler{
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
-    AsynchronousSocketChannel channel;
-    RoomListManager roomListManager = RoomListManager.getInstance();
+    private AsynchronousSocketChannel channel;
+    private RoomListManager roomListManager = RoomListManager.getInstance();
 
     @Override
     public void initialize(AsynchronousSocketChannel channel) {
@@ -51,8 +51,8 @@ class UserNameEventHandler implements NioEventHandler{
             //user name save
             roomListManager.saveClientName(channel, userName);
 
-            Message infoMessage;
-            Message askingMessage;
+            GeneralMessage infoMessage;
+            GeneralMessage askingMessage;
             if(roomListManager.isRoomListEmpty()) {
                 //방이 없다는 정보
                 infoMessage = new GeneralMessage(MessageType.INFO, ProtocolString.INFO_MESSAGE_NO_ROOM.getBytes());

@@ -81,5 +81,11 @@ public class RoomListManager {
         room.broadcast(content);
     }
 
+    public void broadcastFile(AsynchronousSocketChannel channel, byte[] content) {
+        int roomNum = clientInfoList.get(channel).getRoomNum();
+        RoomManager room = roomList.get(roomNum);
+        room.broadcastFile(channel, content);
+    }
+
     //remove room 은 외부 태스크로 주기적으로 방에 애들 아무도 없으면 없애는 것으로? 고민해보자. RoomManager에서 자기 없애라고 할 것인지...
 }

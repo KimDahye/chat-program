@@ -22,7 +22,7 @@ class RoomMakingEventHandler implements NioEventHandler {
 
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
-    AsynchronousSocketChannel channel;
+    private AsynchronousSocketChannel channel;
 
     @Override
     public void initialize(AsynchronousSocketChannel channel) {
@@ -49,7 +49,7 @@ class RoomMakingEventHandler implements NioEventHandler {
             int contentLength = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, 0, LENGTH_DATA_SIZE)); //TODO. 가독성 떨어지니 메소드로 분리해보자.
             String answer = new String(Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength));
 
-            Message message = null;
+            GeneralMessage message = null;
             if(answer.equals(CLIENT_MESSAGE_WANT_TO_MAKE_ROOM)) {
                 // 만들 방 이름 묻기
                 message = new GeneralMessage(MessageType.ROOM_NAME, ASKING_MESSAGE_ROOM_NAME.getBytes());

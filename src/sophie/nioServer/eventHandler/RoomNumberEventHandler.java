@@ -21,8 +21,8 @@ class RoomNumberEventHandler implements NioEventHandler{
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020;
 
-    AsynchronousSocketChannel channel;
-    RoomListManager roomListManager = RoomListManager.getInstance();
+    private AsynchronousSocketChannel channel;
+    private RoomListManager roomListManager = RoomListManager.getInstance();
 
     @Override
     public void initialize(AsynchronousSocketChannel channel) {
@@ -61,7 +61,7 @@ class RoomNumberEventHandler implements NioEventHandler{
             }
 
             //isPassable 값에 따라 분기
-            Message message;
+            GeneralMessage message;
             if(isPassable) {
                 roomListManager.participateRoomAt(roomNumber, channel);
                 message = new GeneralMessage(MessageType.CHAT_START, ProtocolString.INFO_MESSAGE_ROOM_PARTICIPATE.getBytes());
