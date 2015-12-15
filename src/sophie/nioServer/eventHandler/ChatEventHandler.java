@@ -1,10 +1,8 @@
 package sophie.nioServer.eventHandler;
 
-import sophie.model.MessageType;
 import sophie.nioServer.Demultiplexer;
-import sophie.nioServer.NioHandleMap;
+import sophie.nioServer.RoomListManager;
 import sophie.utils.CastUtils;
-import sophie.utils.IOUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,22 +12,16 @@ import java.util.Arrays;
 /**
  * Created by sophie on 2015. 12. 14..
  */
-public class ChatEventHandler implements NioEventHandler {
+class ChatEventHandler implements NioEventHandler {
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
-    private static final int CHAT_TYPE = MessageType.CHAT.getValue();
     private AsynchronousSocketChannel channel;
-    private NioHandleMap handleMap;
+    private RoomListManager roomListManager = RoomListManager.getInstance();
 
     //TODO. cliet list 들고 있어야 한다. 싱글톤 레퍼런스.
 
-    public int getType() {
-        return CHAT_TYPE;
-    }
-
-    public void initialize(AsynchronousSocketChannel channel, NioHandleMap handleMap) {
+    public void initialize(AsynchronousSocketChannel channel) {
         this.channel = channel;
-        this.handleMap= handleMap;
     }
 
     public int getDataSize() {
@@ -53,12 +45,12 @@ public class ChatEventHandler implements NioEventHandler {
 
             // broadcasting
             // TODO. for 문이 들어가야 한다.
-            int bufferSize = TYPE_SIZE + LENGTH_DATA_SIZE + contentLength;
-            IOUtils.sendGeneralMessage(channel, bufferSize, CHAT_TYPE, contentLength, content.getBytes());
+            content = roomListManager.getClientName(channel) + content;
+            roomListManager.broadcast(channel, content);
 
             // 다시 읽기 준비
             ByteBuffer newBuffer = ByteBuffer.allocate(TYPE_SIZE);
-            channel.read(newBuffer, newBuffer, new Demultiplexer(channel, handleMap));
+            channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
         }
     }
 

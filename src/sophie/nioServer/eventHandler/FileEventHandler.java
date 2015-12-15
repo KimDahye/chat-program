@@ -1,27 +1,19 @@
 package sophie.nioServer.eventHandler;
 
-import sophie.model.MessageType;
-import sophie.nioServer.NioHandleMap;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 
 /**
  * Created by sophie on 2015. 12. 14..
  */
-public class FileEventHandler implements NioEventHandler {
+class FileEventHandler implements NioEventHandler {
     private static final int LENGTH_DATA_SIZE = 12;
     private static final int CONTENT_DATA_LIMIT = 2036; // Length data와 합해서 2048이 된다.
     AsynchronousSocketChannel channel;
-    NioHandleMap handleMap;
 
-    public int getType() {
-        return MessageType.FILE.getValue();
-    }
-
-    public void initialize(AsynchronousSocketChannel channel, NioHandleMap handleMap) {
+    public void initialize(AsynchronousSocketChannel channel)
+    {
         this.channel = channel;
-        this.handleMap = handleMap;
     }
 
     public int getDataSize() {

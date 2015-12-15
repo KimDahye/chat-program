@@ -1,5 +1,6 @@
 package sophie.server;
 
+import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
 
@@ -27,7 +28,7 @@ class RoomManager {
         if (clients.size() < roomCapacity) {
             clients.add(clientHandler);
             String msg = "Room" + room + "에 입장하셨습니다.";
-            clientHandler.sendMessage(new Message(MessageType.CHAT, msg.getBytes()));
+            clientHandler.sendMessage(new GeneralMessage(MessageType.CHAT, msg.getBytes()));
             executor.execute(clientHandler);
             clientHandler.setRoomManager(this);
             return;
@@ -39,11 +40,11 @@ class RoomManager {
         if (contentType == contentType.CHAT) {
             byte[] bodyWithNickname = clientHandler.getBodyWithNickname(body);
             for (ClientHandler c : clients) {
-                if (c != null) c.sendMessage(new Message(contentType, bodyWithNickname));
+                if (c != null) c.sendMessage(new GeneralMessage(contentType, bodyWithNickname));
             }
         } else if (contentType == contentType.FILE) {
             for (ClientHandler c : clients) {
-                if (c != clientHandler) c.sendMessage(new Message(contentType, body));
+                if (c != clientHandler) c.sendMessage(new GeneralMessage(contentType, body));
             }
         }
     }
@@ -54,7 +55,7 @@ class RoomManager {
         clients.remove(index);
         String msg = "---- " + clientHandler.getNickname() + " 님이 방을 나갔습니다. ----";
         for(ClientHandler c : clients) {
-            c.sendMessage(new Message(MessageType.CHAT, msg.getBytes()));
+            c.sendMessage(new GeneralMessage(MessageType.CHAT, msg.getBytes()));
         }
     }
 
@@ -71,9 +72,5 @@ class RoomManager {
             if (clients.get(i) == clientHandler) return i;
         }
         return -1;
-    }
-
-    public boolean isYourRoomNumber(int num) {
-        return room.getNumber() == num;
     }
 }

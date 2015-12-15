@@ -1,7 +1,5 @@
 package sophie.nioServer.eventHandler;
 
-import sophie.nioServer.NioHandleMap;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -12,7 +10,6 @@ import java.nio.channels.CompletionHandler;
 public interface NioEventHandler extends CompletionHandler<Integer, ByteBuffer>{
     int TYPE_SIZE = 4;
 
-    int getType();
-    void initialize(AsynchronousSocketChannel channel, NioHandleMap handleMap);
+    void initialize(AsynchronousSocketChannel channel);
     int getDataSize();
 }

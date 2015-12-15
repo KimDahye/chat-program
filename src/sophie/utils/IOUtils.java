@@ -1,6 +1,7 @@
 package sophie.utils;
 
 import sophie.client.exception.OutOfFileLengthLimitException;
+import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
 
@@ -44,24 +45,16 @@ public class IOUtils {
         //body
         byte[] body = new byte[length];
         dis.read(body, 0, length);
-        return new Message(MessageType.fromInteger(type), body);
-    }
-
-    //NIO 관련 utils
-    public static void sendGeneralMessage(AsynchronousSocketChannel channel, int bufferSize, int type, int contentLength, byte[] content) {
-        ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(type).putInt(contentLength).put(content);
-        writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
-        channel.write(writeBuffer);
+        return new GeneralMessage(MessageType.fromInteger(type), body);
     }
 
     public static void sendGeneralMessage(AsynchronousSocketChannel channel, Message message) {
         int bodyLength = message.getBodyLength();
         int bufferSize = message.getHeaderLength() + bodyLength;
-        int type = message.getType().value();
+        int typeValue = message.getMessageType().getValue();
 
-        ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(type).putInt(bodyLength).put(message.getBody());
+        ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(typeValue).putInt(bodyLength).put(message.getBody());
         writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
         channel.write(writeBuffer);
     }
-
 }

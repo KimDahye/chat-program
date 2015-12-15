@@ -4,7 +4,7 @@ import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
 import sophie.nioServer.Demultiplexer;
-import sophie.nioServer.NioHandleMap;
+import sophie.nioServer.RoomListManager;
 import sophie.utils.CastUtils;
 import sophie.utils.IOUtils;
 
@@ -16,28 +16,19 @@ import java.util.Arrays;
 /**
  * Created by sophie on 2015. 12. 14..
  */
-public class UserNameEventHandler implements NioEventHandler{
+class UserNameEventHandler implements NioEventHandler{
     private static final String INFO_MESSAGE_NO_ROOM = "There is no room. You should make the first room!";
     private static final String ASKING_MESSAGE_MAKING = "Do you wanna make room? (yes/any key)";
-    private static final String CLIENT_MESSAGE_WANT_TO_MAKE_ROOM = "yes";
     private static final String ASKING_MESSAGE_ROOM_NAME = "Type the room name you want to make: ";
 
-    private static final MessageType TYPE = MessageType.USER_NAME;
-    private static final int TYPE_AS_INT = TYPE.getValue();
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
     AsynchronousSocketChannel channel;
-    NioHandleMap handleMap;
+    RoomListManager roomListManager = RoomListManager.getInstance();
 
     @Override
-    public int getType() {
-        return TYPE_AS_INT;
-    }
-
-    @Override
-    public void initialize(AsynchronousSocketChannel channel, NioHandleMap handleMap) {
+    public void initialize(AsynchronousSocketChannel channel) {
         this.channel = channel;
-        this.handleMap = handleMap;
     }
 
     @Override
@@ -59,18 +50,20 @@ public class UserNameEventHandler implements NioEventHandler{
             byte[] bufferAsArray = buffer.array();
             int contentLength = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, 0, LENGTH_DATA_SIZE)); //TODO. 가독성 떨어지니 메소드로 분리해보자.
             String userName = new String(Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength));
-            //TODO. userName save
 
-            Message infoMessage = null;
-            Message askingMessage = null;
-            if(roomList.isEmpty()) {
+            //user name save
+            roomListManager.saveClientName(channel, userName);
+
+            Message infoMessage;
+            Message askingMessage;
+            if(roomListManager.isRoomListEmpty()) {
                 //방이 없다는 정보
                 infoMessage = new GeneralMessage(MessageType.INFO, INFO_MESSAGE_NO_ROOM.getBytes());
                 //새로 만들 방 이름을 묻는 질문
                 askingMessage = new GeneralMessage(MessageType.ROOM_NAME, ASKING_MESSAGE_ROOM_NAME.getBytes());
             } else {
                 // 이미 만들어진 방 정보
-                infoMessage = new GeneralMessage(MessageType.INFO, roomList.getRoomInfo());
+                infoMessage = new GeneralMessage(MessageType.INFO, roomListManager.getAvailableRoomInfoList().getBytes());
                 // 방 만들 건지 묻는 질문
                 askingMessage = new GeneralMessage(MessageType.ROOM_MAKING, ASKING_MESSAGE_MAKING.getBytes());
             }
@@ -79,7 +72,7 @@ public class UserNameEventHandler implements NioEventHandler{
 
             // 다시 읽기 준비
             ByteBuffer newBuffer = ByteBuffer.allocate(TYPE_SIZE);
-            channel.read(newBuffer, newBuffer, new Demultiplexer(channel, handleMap));
+            channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
         }
     }
 

@@ -1,6 +1,8 @@
 package sophie.nioServer;
 
+import sophie.nioServer.eventHandler.EventHandlerFactory;
 import sophie.nioServer.eventHandler.NioEventHandler;
+import sophie.server.RoomListManager;
 import sophie.utils.CastUtils;
 
 import java.io.IOException;
@@ -10,14 +12,14 @@ import java.nio.channels.CompletionHandler;
 
 /**
  * Created by sophie on 2015. 12. 13..
+ * 헤더의 첫 4byte 를 읽고 나서 실행되는 handler
+ * 여기서 타입 종류에 따라 다른 handler 등록해준다(demultiplex).
  */
 public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
     private AsynchronousSocketChannel channel;
-    private NioHandleMap handleMap;
 
-    public Demultiplexer(AsynchronousSocketChannel channel, NioHandleMap handleMap) {
+    public Demultiplexer(AsynchronousSocketChannel channel) {
         this.channel = channel;
-        this.handleMap = handleMap;
     }
 
     public void completed(Integer result, ByteBuffer buffer) {
@@ -29,10 +31,14 @@ public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
             }
         } else if (result > 0) {
             buffer.flip();
-            int type = CastUtils.byteArrayToInt(buffer.array());
-            NioEventHandler handler = handleMap.get(type);
+            int typeValue = CastUtils.byteArrayToInt(buffer.array());
+
+            //팩토리 클래스를 통해 handler 인스턴스를 얻는다.
+            NioEventHandler handler = EventHandlerFactory.getEventHandler(typeValue);
+            handler.initialize(channel);
+
+            // read 작업에 대해 handler 등록
             ByteBuffer newBuffer = ByteBuffer.allocate(handler.getDataSize());
-            handler.initialize(channel, handleMap);
             channel.read(newBuffer, newBuffer, handler);
         }
     }

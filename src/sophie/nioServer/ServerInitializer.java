@@ -1,6 +1,7 @@
 package sophie.nioServer;
 
 import sophie.nioServer.eventHandler.*;
+import sophie.server.RoomListManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -21,21 +22,6 @@ public class ServerInitializer {
     public static void main(String[] args) {
         System.out.println("Server Start!");
 
-        // Message Type에 따른 다양한 핸들러 생성 및 등록 - TODO. FactoryClass로 바꾸기. 싱글톤이 아닌 인스턴스가 필요하다.
-        NioHandleMap handleMap = new NioHandleMap();
-        NioEventHandler chatEventHandler = new ChatEventHandler();
-        NioEventHandler fileEventHandler = new FileEventHandler();
-        NioEventHandler userNameEventHandler = new UserNameEventHandler();
-        NioEventHandler roomMakingEventHandler = new RoomMakingEventHandler();
-        NioEventHandler roomNameEventHandler = new RoomNameEventHandler();
-        NioEventHandler roomNumberEventHandler = new RoomNumberEventHandler();
-        handleMap.put(chatEventHandler.getType(), chatEventHandler);
-        handleMap.put(fileEventHandler.getType(), fileEventHandler);
-        handleMap.put(userNameEventHandler.getType(), userNameEventHandler);
-        handleMap.put(roomMakingEventHandler.getType(), roomMakingEventHandler);
-        handleMap.put(roomNameEventHandler.getType(), roomNameEventHandler);
-        handleMap.put(roomNumberEventHandler.getType(), roomNumberEventHandler);
-
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
         try {
@@ -44,7 +30,7 @@ public class ServerInitializer {
             // 스트림 지향의 리스닝 소켓을 위한 비동기 채널
             AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open(group);
             listener.bind(new InetSocketAddress(PORT), BACK_LOG);
-            listener.accept(listener, new Dispatcher(handleMap));
+            listener.accept(listener, new Dispatcher());
         } catch (IOException e) {
             e.printStackTrace();
         }

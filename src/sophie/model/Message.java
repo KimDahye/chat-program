@@ -3,7 +3,7 @@ package sophie.model;
 /**
  * Created by sophie on 2015. 12. 7..
  */
-public class Message {
+public abstract class Message {
     MessageType messageType;
     byte[] body;
 
@@ -19,4 +19,10 @@ public class Message {
     public byte[] getBody() {
         return body;
     }
+
+    public int getBodyLength() {
+        return body.length;
+    }
+
+    abstract public int getHeaderLength();
 }

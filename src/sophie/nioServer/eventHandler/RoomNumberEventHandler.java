@@ -4,7 +4,7 @@ import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
 import sophie.nioServer.Demultiplexer;
-import sophie.nioServer.NioHandleMap;
+import sophie.nioServer.RoomListManager;
 import sophie.utils.CastUtils;
 import sophie.utils.IOUtils;
 
@@ -16,28 +16,20 @@ import java.util.Arrays;
 /**
  * Created by sophie on 2015. 12. 14..
  */
-public class RoomNumberEventHandler implements NioEventHandler{
+class RoomNumberEventHandler implements NioEventHandler{
     private static final String INFO_MESSAGE_INVALID_ROOM_NUMBER = "올바른 방 번호가 아닙니다.";
-    private static final String INFO_MESSAGE_ROOM_PARTICIPATE = "방에 참가하였습니다.";
+    private static final String INFO_MESSAGE_ROOM_PARTICIPATE = "------- 방에 참가하였습니다 ---------";
     private static final String ASKING_MESSAGE_ROOM_NUMBER = "Enter room number if you want to participate: ";
 
-    private static final MessageType TYPE = MessageType.ROOM_NUM;
-    private static final int TYPE_AS_INT = TYPE.getValue();
     private static final int LENGTH_DATA_SIZE = 4;
     private static final int CONTENT_DATA_LIMIT = 1020;
 
     AsynchronousSocketChannel channel;
-    NioHandleMap handleMap;
+    RoomListManager roomListManager = RoomListManager.getInstance();
 
     @Override
-    public int getType() {
-        return TYPE_AS_INT;
-    }
-
-    @Override
-    public void initialize(AsynchronousSocketChannel channel, NioHandleMap handleMap) {
+    public void initialize(AsynchronousSocketChannel channel) {
         this.channel = channel;
-        this.handleMap = handleMap;
     }
 
     @Override
@@ -62,9 +54,9 @@ public class RoomNumberEventHandler implements NioEventHandler{
 
             boolean isPassable = roomListManager.isExistentRoomNumber(roomNumber);
 
-            Message message = null;
+            Message message;
             if(isPassable) {
-                roomListManager.participateRoomAt(roomNumber, clientHandler);
+                roomListManager.participateRoomAt(roomNumber, channel);
                 message = new GeneralMessage(MessageType.INFO, INFO_MESSAGE_ROOM_PARTICIPATE.getBytes());
             } else {
                 String content = INFO_MESSAGE_INVALID_ROOM_NUMBER + '\n' + ASKING_MESSAGE_ROOM_NUMBER;
@@ -74,7 +66,7 @@ public class RoomNumberEventHandler implements NioEventHandler{
 
             // 다시 읽기 준비
             ByteBuffer newBuffer = ByteBuffer.allocate(TYPE_SIZE);
-            channel.read(newBuffer, newBuffer, new Demultiplexer(channel, handleMap));
+            channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
         }
     }
 
