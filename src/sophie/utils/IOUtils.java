@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Created by sophie on 2015. 12. 10..
@@ -44,7 +46,10 @@ public class IOUtils {
 
         //body
         byte[] body = new byte[length];
-        dis.read(body, 0, length);
+        int curLength = 0;
+        while(curLength < length) {
+            curLength = curLength + dis.read(body, curLength, length-curLength);
+        }
         return new GeneralMessage(MessageType.fromInteger(type), body);
     }
 
@@ -65,7 +70,14 @@ public class IOUtils {
 
         ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(typeValue).putInt(bodyLength).put(message.getBody());
         writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
-        channel.write(writeBuffer);
+        Future<Integer> future = channel.write(writeBuffer);
+        try {
+            future.get(); //blocking;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void sendFileMessage(AsynchronousSocketChannel channel, FileMessage message) {
@@ -76,10 +88,22 @@ public class IOUtils {
 
         ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(typeValue).putInt(bodyLength).put(message.getBody());
         writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
-        channel.write(writeBuffer);
+        channel.write(writeBuffer); // 대용량 보낼 때 여기서 문제가 난다...
     }
 
     public static void sendMessage(AsynchronousSocketChannel channel, Message message) {
         //여기서 message  type에 따라 sendGeneralMessage, sendFileMessage 부르도록 하자.
+    }
+
+    public static void sendBody(AsynchronousSocketChannel channel, byte[] content) {
+        ByteBuffer buffer = ByteBuffer.allocate(content.length);
+        Future<Integer> future = channel.write(buffer);
+        try {
+            future.get(); //blocking;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 }

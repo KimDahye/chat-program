@@ -17,22 +17,8 @@ import java.util.Arrays;
 /**
  * Created by sophie on 2015. 12. 14..
  */
-class RoomNameEventHandler implements NioEventHandler {
-    private static final int LENGTH_DATA_SIZE = 4;
-    private static final int CONTENT_DATA_LIMIT = 1020; //Length data size 와 합하여 1024가 되도록
-
-    private AsynchronousSocketChannel channel;
+class RoomNameEventHandler extends AbstractNioEventHandler {
     private RoomListManager roomListManager = RoomListManager.getInstance();
-
-    @Override
-    public void initialize(AsynchronousSocketChannel channel) {
-        this.channel = channel;
-    }
-
-    @Override
-    public int getDataSize() {
-        return TYPE_SIZE + LENGTH_DATA_SIZE + CONTENT_DATA_LIMIT;
-    }
 
     @Override
     public void completed(Integer result, ByteBuffer buffer) {
@@ -44,17 +30,14 @@ class RoomNameEventHandler implements NioEventHandler {
                 e.printStackTrace();
             }
         } else if (result > 0) {
-            buffer.flip();
-            byte[] bufferAsArray = buffer.array();
-            int contentLength = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, 0, LENGTH_DATA_SIZE)); //TODO. 가독성 떨어지니 메소드로 분리해보자.
-            String roomName = new String(Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength));
+            String roomName = new String(getContent(buffer, result));
 
             roomListManager.makeRoom(roomName, channel);
             GeneralMessage message = new GeneralMessage(MessageType.CHAT_START, ProtocolString.INFO_MESSAGE_ROOM_PARTICIPATE.getBytes());
             IOUtils.sendGeneralMessage(channel, message);
 
             // 다시 읽기 준비
-            ByteBuffer newBuffer = ByteBuffer.allocate(TYPE_SIZE);
+            ByteBuffer newBuffer = ByteBuffer.allocate(HEADER_SIZE);
             channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
         }
     }

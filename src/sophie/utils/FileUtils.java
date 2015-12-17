@@ -46,7 +46,7 @@ public class FileUtils {
     public static void saveFile(byte[] body) {
         try {
             //TODO. 프로토콜에 파일네임 넣는 게 없어서 일단 파일네임은 임의로 정한다. 수정해야 할 부분.
-            String fileName = uuid + "download" + (downloadCount++) + ".txt";
+            String fileName = uuid + "download" + (downloadCount++) + ".pdf";
 
             // 파일을 생성하고 파일에 대한 출력 스트림 생성
             File file = new File(fileName);

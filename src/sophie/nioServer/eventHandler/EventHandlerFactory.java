@@ -4,7 +4,7 @@ package sophie.nioServer.eventHandler;
  * Created by sophie on 2015. 12. 14..
  */
 public class EventHandlerFactory {
-    private EventHandlerFactory(){};
+    private EventHandlerFactory(){}
 
     public static NioEventHandler getEventHandler(int typeValue) {
         switch(typeValue) {

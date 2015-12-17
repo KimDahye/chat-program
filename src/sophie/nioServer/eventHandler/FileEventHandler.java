@@ -2,30 +2,16 @@ package sophie.nioServer.eventHandler;
 
 import sophie.nioServer.Demultiplexer;
 import sophie.nioServer.RoomListManager;
-import sophie.utils.CastUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.util.Arrays;
 
 /**
  * Created by sophie on 2015. 12. 14..
  */
-class FileEventHandler implements NioEventHandler {
-    private static final int LENGTH_DATA_SIZE = 4; //TODO. 12로 바뀌어야 함.
-    private static final int CONTENT_DATA_LIMIT = 2040; // Header와 body 합해서 2048이 된다.
-    private AsynchronousSocketChannel channel;
+class FileEventHandler extends AbstractNioEventHandler {
     private RoomListManager roomListManager = RoomListManager.getInstance();
-
-    public void initialize(AsynchronousSocketChannel channel)
-    {
-        this.channel = channel;
-    }
-
-    public int getDataSize() {
-        return LENGTH_DATA_SIZE + CONTENT_DATA_LIMIT;
-    }
+    private int currentLength = 0;
 
     public void completed(Integer result, ByteBuffer buffer) {
         //서버에 저장하지 않고 바로 방에 있는 클라이언트에게 전달해준다. - 받은 것 바로 전달해주면 됨.
@@ -37,17 +23,25 @@ class FileEventHandler implements NioEventHandler {
                 e.printStackTrace();
             }
         } else if (result > 0) {
-            buffer.flip();
-            byte[] bufferAsArray = buffer.array();
-            int contentLength = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, 0, LENGTH_DATA_SIZE)); //TODO. 가독성 떨어지니 메소드로 분리해보자.
-            byte[] content = Arrays.copyOfRange(bufferAsArray, LENGTH_DATA_SIZE, LENGTH_DATA_SIZE + contentLength);
+            byte[] content = getContent(buffer, result);
+            if(currentLength == 0) {
+                // broadcasting
+                roomListManager.broadcastFile(channel, content);
+            } else {
+                roomListManager.broadcastFileWithoutHeader(channel, content);
+            }
 
-            // broadcasting
-            roomListManager.broadcastFile(channel, content);
-
-            // 다시 읽기 준비
-            ByteBuffer newBuffer = ByteBuffer.allocate(TYPE_SIZE);
-            channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
+            currentLength = currentLength + result;
+            if(currentLength == length) {
+                // 다시 헤더 읽기 준비
+                ByteBuffer newBuffer = ByteBuffer.allocate(HEADER_SIZE);
+                channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
+            } else  {
+                // 남은 파일 이어서 읽기 준비
+                // TODO. 버퍼 재활용... 잘 될까?
+                ByteBuffer newBuffer = ByteBuffer.allocate(length - currentLength);
+                channel.read(newBuffer, newBuffer, this);
+            }
         }
     }
 

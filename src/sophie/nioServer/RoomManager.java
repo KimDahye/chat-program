@@ -52,4 +52,12 @@ class RoomManager {
             }
         }
     }
+
+    public void broadcastFileWithoutHeader(AsynchronousSocketChannel channel, byte[] content) {
+        for(AsynchronousSocketChannel c : clients) {
+            if(c != channel) {
+                IOUtils.sendBody(c, content);
+            }
+        }
+    }
 }

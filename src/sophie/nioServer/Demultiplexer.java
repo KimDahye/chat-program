@@ -1,5 +1,6 @@
 package sophie.nioServer;
 
+import sophie.nioServer.eventHandler.AbstractNioEventHandler;
 import sophie.nioServer.eventHandler.EventHandlerFactory;
 import sophie.nioServer.eventHandler.NioEventHandler;
 import sophie.utils.CastUtils;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.Arrays;
 
 /**
  * Created by sophie on 2015. 12. 13..
@@ -16,6 +18,7 @@ import java.nio.channels.CompletionHandler;
  */
 public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
     private AsynchronousSocketChannel channel;
+    private static final int TYPE_HEADER_SIZE = 4;
 
     public Demultiplexer(AsynchronousSocketChannel channel) {
         this.channel = channel;
@@ -30,11 +33,18 @@ public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
             }
         } else if (result > 0) {
             buffer.flip();
-            int typeValue = CastUtils.byteArrayToInt(buffer.array());
+            byte[] bufferAsArray = buffer.array();
+
+            //TODO. 사실 result가 8 임을 확인하고 아래를 진행해야 하는데 그냥 함....
+            int typeValue = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, 0, TYPE_HEADER_SIZE));
+            int length = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, TYPE_HEADER_SIZE, AbstractNioEventHandler.getHeaderSize()));
 
             //팩토리 클래스를 통해 handler 인스턴스를 얻는다.
             NioEventHandler handler = EventHandlerFactory.getEventHandler(typeValue);
-            handler.initialize(channel);
+
+            if (handler != null) {
+                handler.initialize(channel, length);
+            }
 
             // read 작업에 대해 handler 등록
             ByteBuffer newBuffer = ByteBuffer.allocate(handler.getDataSize());

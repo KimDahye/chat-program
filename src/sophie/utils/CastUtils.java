@@ -1,7 +1,5 @@
 package sophie.utils;
 
-import java.nio.ByteBuffer;
-
 /**
  * Created by sophie on 2015. 12. 10..
  */

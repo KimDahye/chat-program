@@ -7,9 +7,8 @@ import java.nio.channels.CompletionHandler;
 /**
  * Created by sophie on 2015. 12. 13..
  */
-public interface NioEventHandler extends CompletionHandler<Integer, ByteBuffer>{
-    int TYPE_SIZE = 4;
+public interface NioEventHandler extends CompletionHandler<Integer, ByteBuffer> {
+    void initialize(AsynchronousSocketChannel channel, int length);
 
-    void initialize(AsynchronousSocketChannel channel);
     int getDataSize();
 }
