@@ -30,7 +30,7 @@ class ServerToConsoleHandler {
     void handle(Message msg) {
         //TODO. 방 들어가는 거에 관련된 것들은 거의 같은 작업을 한다... 이 부분 중복 제거해보자.
         if (msg.getMessageType() == MessageType.CHAT) {
-            System.out.println(new String(msg.getBody()));
+            System.out.println("CHAT-" + new String(msg.getBody()));
             return;
         }
         if (msg.getMessageType() == MessageType.FILE) {

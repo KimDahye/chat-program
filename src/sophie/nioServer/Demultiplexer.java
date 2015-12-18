@@ -4,6 +4,7 @@ import sophie.nioServer.eventHandler.AbstractNioEventHandler;
 import sophie.nioServer.eventHandler.EventHandlerFactory;
 import sophie.nioServer.eventHandler.NioEventHandler;
 import sophie.utils.CastUtils;
+import sophie.utils.IOUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
     private AsynchronousSocketChannel channel;
     private static final int TYPE_HEADER_SIZE = 4;
+    private int current=0;
 
     public Demultiplexer(AsynchronousSocketChannel channel) {
         this.channel = channel;
@@ -32,6 +34,12 @@ public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
                 e.printStackTrace();
             }
         } else if (result > 0) {
+            current = current + result;
+            if(result < AbstractNioEventHandler.getHeaderSize()) {
+                channel.read(buffer, buffer, this);
+                return;
+            }
+
             buffer.flip();
             byte[] bufferAsArray = buffer.array();
 
@@ -41,7 +49,6 @@ public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
 
             //팩토리 클래스를 통해 handler 인스턴스를 얻는다.
             NioEventHandler handler = EventHandlerFactory.getEventHandler(typeValue);
-
             if (handler != null) {
                 handler.initialize(channel, length);
             }

@@ -1,10 +1,14 @@
 package sophie.utils;
 
+import groovy.json.internal.Byt;
 import sophie.client.exception.OutOfFileLengthLimitException;
 import sophie.model.FileMessage;
 import sophie.model.GeneralMessage;
 import sophie.model.Message;
 import sophie.model.MessageType;
+import sophie.nioServer.eventHandler.AbstractNioEventHandler;
+import sophie.nioServer.eventHandler.NioEventHandler;
+import sophie.nioServer.eventHandler.WriteEventHandler;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -23,8 +27,11 @@ public class IOUtils {
     public static void sendMessage(DataOutputStream dos, int typeValue, byte[] body) throws IOException {
         dos.writeInt(typeValue);
         dos.writeInt(body.length);
+
         dos.write(body);
+        System.out.println(dos.size());
         dos.flush();
+        System.out.println(dos.size());
     }
 
     public static void sendChatMessage(DataOutputStream dos, String msg) throws IOException {
@@ -70,9 +77,14 @@ public class IOUtils {
 
         ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(typeValue).putInt(bodyLength).put(message.getBody());
         writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
-        Future<Integer> future = channel.write(writeBuffer);
+        channel.write(writeBuffer, writeBuffer, new WriteEventHandler(channel, bufferSize)); //여길 바꿨다!
+    }
+
+    public static void sendFileMessageWithoutHeader(AsynchronousSocketChannel channel, ByteBuffer buffer) {
+        buffer.rewind(); //이걸 하지 않으면 제대로 안간다.
+        Future<Integer> w = channel.write(buffer);
         try {
-            future.get(); //blocking;
+            w.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -80,30 +92,16 @@ public class IOUtils {
         }
     }
 
-    public static void sendFileMessage(AsynchronousSocketChannel channel, FileMessage message) {
-        //TODO. TYPE, FileNameLength, FileExtLength, FileContentLength
-        int bodyLength = message.getBodyLength();
-        int bufferSize = message.getHeaderLength() + bodyLength;
-        int typeValue = message.getMessageType().getValue();
-
-        ByteBuffer writeBuffer = ByteBuffer.allocate(bufferSize).putInt(typeValue).putInt(bodyLength).put(message.getBody());
-        writeBuffer.rewind(); //이걸 하지 않으면 제대로 안간다.
-        channel.write(writeBuffer); // 대용량 보낼 때 여기서 문제가 난다...
+    public static void sendHeader(AsynchronousSocketChannel channel, int type, int length) {
+        int headerSize = AbstractNioEventHandler.getHeaderSize();
+        ByteBuffer writeBuffer = ByteBuffer.allocate(headerSize);
+        writeBuffer.putInt(type).putInt(length);
+        writeBuffer.rewind();
+        channel.write(writeBuffer);
     }
 
-    public static void sendMessage(AsynchronousSocketChannel channel, Message message) {
-        //여기서 message  type에 따라 sendGeneralMessage, sendFileMessage 부르도록 하자.
-    }
-
-    public static void sendBody(AsynchronousSocketChannel channel, byte[] content) {
-        ByteBuffer buffer = ByteBuffer.allocate(content.length);
-        Future<Integer> future = channel.write(buffer);
-        try {
-            future.get(); //blocking;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+    public static void sendFileMessageWitHeader(AsynchronousSocketChannel channel, int length, ByteBuffer buffer) {
+        sendHeader(channel, MessageType.FILE.getValue(), length);
+        sendFileMessageWithoutHeader(channel, buffer);
     }
 }

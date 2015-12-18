@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 class FileEventHandler extends AbstractNioEventHandler {
     private RoomListManager roomListManager = RoomListManager.getInstance();
     private int currentLength = 0;
+    private final int DEFAULT_BUFFER_SIZE = 2048;
 
     public void completed(Integer result, ByteBuffer buffer) {
         //서버에 저장하지 않고 바로 방에 있는 클라이언트에게 전달해준다. - 받은 것 바로 전달해주면 됨.
@@ -23,24 +24,26 @@ class FileEventHandler extends AbstractNioEventHandler {
                 e.printStackTrace();
             }
         } else if (result > 0) {
-            byte[] content = getContent(buffer, result);
-            if(currentLength == 0) {
-                // broadcasting
-                roomListManager.broadcastFile(channel, content);
+            //byte[] content = getContent(buffer, result);
+            currentLength = currentLength + result;
+
+            //broadcast
+            if(currentLength == result) {
+                buffer.flip();
+                roomListManager.broadcastFileWithHeader(channel, length, buffer);
             } else {
-                roomListManager.broadcastFileWithoutHeader(channel, content);
+                buffer.flip();
+                roomListManager.broadcastFileWithoutHeader(channel, buffer);
             }
 
-            currentLength = currentLength + result;
-            if(currentLength == length) {
+            if(currentLength < length) {
+                // 남은 파일 이어서 읽기 준비
+                ByteBuffer newBuffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
+                channel.read(newBuffer, newBuffer, this);
+            } else if(currentLength == length) {
                 // 다시 헤더 읽기 준비
                 ByteBuffer newBuffer = ByteBuffer.allocate(HEADER_SIZE);
                 channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
-            } else  {
-                // 남은 파일 이어서 읽기 준비
-                // TODO. 버퍼 재활용... 잘 될까?
-                ByteBuffer newBuffer = ByteBuffer.allocate(length - currentLength);
-                channel.read(newBuffer, newBuffer, this);
             }
         }
     }
@@ -48,5 +51,10 @@ class FileEventHandler extends AbstractNioEventHandler {
     //TODO
     public void failed(Throwable exc, ByteBuffer attachment) {
 
+    }
+
+    @Override
+    public int getDataSize() {
+        return DEFAULT_BUFFER_SIZE;
     }
 }

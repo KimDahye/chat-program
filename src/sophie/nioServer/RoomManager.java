@@ -5,6 +5,7 @@ import sophie.model.GeneralMessage;
 import sophie.model.MessageType;
 import sophie.utils.IOUtils;
 
+import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 
@@ -44,19 +45,18 @@ class RoomManager {
         }
     }
 
-    public void broadcastFile(AsynchronousSocketChannel channel, byte[] content) {
-        //channel 은 빼고 content전달해야함.
+    public void broadcastFileWithoutHeader(AsynchronousSocketChannel channel, ByteBuffer buffer) {
         for(AsynchronousSocketChannel c : clients) {
             if(c != channel) {
-                IOUtils.sendFileMessage(c, new FileMessage(content));
+                IOUtils.sendFileMessageWithoutHeader(c, buffer);
             }
         }
     }
 
-    public void broadcastFileWithoutHeader(AsynchronousSocketChannel channel, byte[] content) {
+    public void broadcastFileWithHeader(AsynchronousSocketChannel channel, int length, ByteBuffer buffer) {
         for(AsynchronousSocketChannel c : clients) {
             if(c != channel) {
-                IOUtils.sendBody(c, content);
+                IOUtils.sendFileMessageWitHeader(c, length, buffer);
             }
         }
     }

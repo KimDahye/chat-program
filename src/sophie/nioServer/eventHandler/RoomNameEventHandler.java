@@ -30,7 +30,7 @@ class RoomNameEventHandler extends AbstractNioEventHandler {
                 e.printStackTrace();
             }
         } else if (result > 0) {
-            String roomName = new String(getContent(buffer, result));
+            String roomName = new String(getContent(buffer, result)); // 여기서 roomName이 null이면 다시 쓰라고 해야함.
 
             roomListManager.makeRoom(roomName, channel);
             GeneralMessage message = new GeneralMessage(MessageType.CHAT_START, ProtocolString.INFO_MESSAGE_ROOM_PARTICIPATE.getBytes());

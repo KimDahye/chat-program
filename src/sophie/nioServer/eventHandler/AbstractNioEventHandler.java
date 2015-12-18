@@ -30,11 +30,13 @@ public abstract class AbstractNioEventHandler implements NioEventHandler {
 
     /** protected 함수*/
     byte[] getContent(ByteBuffer buffer, int length) {
+        int position = buffer.position();
         buffer.flip();
         byte[] bufferAsArray = buffer.array();
         if(bufferAsArray.length < length) {
             throw new IllegalArgumentException("length가 더 크면 안됩니다."); //TODO. test case 만들자.
         }
+        buffer.position(position);
         return Arrays.copyOfRange(bufferAsArray, 0, length);
     }
 }
