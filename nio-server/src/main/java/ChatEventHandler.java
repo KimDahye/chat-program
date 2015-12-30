@@ -5,7 +5,12 @@ import java.nio.ByteBuffer;
  * Created by sophie on 2015. 12. 14..
  */
 class ChatEventHandler extends AbstractNioEventHandler {
-    private RoomListManager roomListManager = RoomListManager.getInstance();
+    private RoomListManager roomListManager;
+
+    public void setRoomListManager(RoomListManager roomListManager) {
+        System.out.println("DI with setter");
+        this.roomListManager = roomListManager;
+    }
 
     public void completed(Integer result, ByteBuffer buffer) {
         if(result == -1) {

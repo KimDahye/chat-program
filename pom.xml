@@ -22,6 +22,7 @@
             </plugins>
         </pluginManagement>
     </build>
+
     <modules>
         <module>classic-server</module>
         <module>client</module>
@@ -31,4 +32,11 @@
         <module>nio-simple-server</module>
         <module>utils</module>
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>4.2.4.RELEASE</version>
+        </dependency>
+    </dependencies>
 </project>

@@ -17,12 +17,12 @@
     <dependencies>
         <dependency>
             <groupId>sophie.chatting</groupId>
-            <artifactId>chatting-utils</artifactId>
+            <artifactId>chatting-model</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>sophie.chatting</groupId>
-            <artifactId>chatting-model</artifactId>
+            <artifactId>chatting-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
