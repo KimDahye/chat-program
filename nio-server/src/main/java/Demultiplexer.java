@@ -9,13 +9,15 @@ import java.util.Arrays;
  * 헤더의 첫 4byte 를 읽고 나서 실행되는 handler
  * 여기서 타입 종류에 따라 다른 handler 등록해준다(demultiplex).
  */
-public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
+class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
     private AsynchronousSocketChannel channel;
     private static final int TYPE_HEADER_SIZE = 4;
     private int current=0;
+    EventHandlerFactory factory;
 
-    public Demultiplexer(AsynchronousSocketChannel channel) {
+    public Demultiplexer(AsynchronousSocketChannel channel, EventHandlerFactory factory) {
         this.channel = channel;
+        this.factory = factory;
     }
 
     public void completed(Integer result, ByteBuffer buffer) {
@@ -40,9 +42,9 @@ public class Demultiplexer implements CompletionHandler<Integer, ByteBuffer> {
             int length = CastUtils.byteArrayToInt(Arrays.copyOfRange(bufferAsArray, TYPE_HEADER_SIZE, AbstractNioEventHandler.getHeaderSize()));
 
             //팩토리 클래스를 통해 handler 인스턴스를 얻는다.
-            NioEventHandler handler = EventHandlerFactory.getEventHandler(typeValue);
+            NioEventHandler handler = factory.getEventHandler(typeValue);
             if (handler != null) {
-                handler.initialize(channel, length);
+                handler.initialize(channel, length, factory);
             }
 
             // read 작업에 대해 handler 등록

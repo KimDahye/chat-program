@@ -6,7 +6,13 @@ import java.nio.channels.CompletionHandler;
 /**
  * Created by sophie on 2015. 12. 13..
  */
-public class Dispatcher implements CompletionHandler<AsynchronousSocketChannel, AsynchronousServerSocketChannel> {
+class Dispatcher implements CompletionHandler<AsynchronousSocketChannel, AsynchronousServerSocketChannel> {
+    EventHandlerFactory factory;
+
+    Dispatcher(EventHandlerFactory factory) {
+        this.factory = factory;
+    }
+
     public void completed(AsynchronousSocketChannel channel, AsynchronousServerSocketChannel listener) {
         listener.accept(listener, this);
 
@@ -16,7 +22,7 @@ public class Dispatcher implements CompletionHandler<AsynchronousSocketChannel, 
 
         // 응답에 대한 핸들러 등록
         ByteBuffer buffer = ByteBuffer.allocate(AbstractNioEventHandler.getHeaderSize());
-        channel.read(buffer, buffer, new Demultiplexer(channel));
+        channel.read(buffer, buffer, new Demultiplexer(channel, factory));
     }
 
     public void failed(Throwable exc, AsynchronousServerSocketChannel listener) {

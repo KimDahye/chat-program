@@ -5,15 +5,17 @@ import java.util.Arrays;
 /**
  * Created by sophie on 2015. 12. 17..
  */
-public abstract class AbstractNioEventHandler implements NioEventHandler {
+abstract class AbstractNioEventHandler implements NioEventHandler {
     AsynchronousSocketChannel channel;
+    EventHandlerFactory factory;
     int length;
     static final int HEADER_SIZE = 8; // IOUtils 에 중복있다.
 
     @Override
-    public void initialize(AsynchronousSocketChannel channel, int length) {
+    public void initialize(AsynchronousSocketChannel channel, int length, EventHandlerFactory factory) {
         this.channel = channel;
         this.length = length;
+        this.factory = factory;
     }
 
     @Override

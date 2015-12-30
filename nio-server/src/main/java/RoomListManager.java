@@ -5,22 +5,13 @@ import java.util.HashMap;
 /**
  * Created by sophie on 2015. 12. 2..
  */
-public class RoomListManager {
-    private static final RoomListManager instance = new RoomListManager(); //singleton
+class RoomListManager {
     private HashMap<Integer, RoomManager> roomList = new HashMap<Integer, RoomManager>();
     private static final int MAX_THREAD_NUM = 100; // ClientHandler 쓰레드 풀의 max number
     private static int roomNumber = 0;
 
     // proactor 패턴때문에 새로 생긴 필드
     private static final HashMap<AsynchronousSocketChannel, ClientInfo> clientInfoList = new HashMap<AsynchronousSocketChannel, ClientInfo>();
-
-    private RoomListManager() {
-        //singleton
-    }
-
-    public static RoomListManager getInstance() {
-        return instance;
-    }
 
     public String getAvailableRoomInfoList() {
         // capacity가 MAX_THREAD_NUM 미만 인것만 알려준다.

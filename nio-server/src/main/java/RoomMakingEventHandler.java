@@ -30,7 +30,7 @@ class RoomMakingEventHandler extends AbstractNioEventHandler {
 
             // 다시 읽기 준비
             ByteBuffer newBuffer = ByteBuffer.allocate(HEADER_SIZE);
-            channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
+            channel.read(newBuffer, newBuffer, new Demultiplexer(channel, factory));
         }
     }
 

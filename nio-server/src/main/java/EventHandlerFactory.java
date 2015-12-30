@@ -1,23 +1,27 @@
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 /**
  * Created by sophie on 2015. 12. 14..
  */
-public class EventHandlerFactory {
-    private EventHandlerFactory(){}
+class EventHandlerFactory {
+    private static final String SPRING_APPLICATION_CONTEXT_FILE_NAME = "applicationContext-nio-server.xml";
+    ApplicationContext context = new ClassPathXmlApplicationContext(SPRING_APPLICATION_CONTEXT_FILE_NAME);
 
-    public static NioEventHandler getEventHandler(int typeValue) {
+    public NioEventHandler getEventHandler(int typeValue) {
         switch(typeValue) {
             case 0:
-                return new ChatEventHandler();
+                return (ChatEventHandler) context.getBean("ChatEventHandler");
             case 1:
-                return new FileEventHandler();
+                return (FileEventHandler) context.getBean("FileEventHandler");
             case 2:
-                return new UserNameEventHandler();
+                return (UserNameEventHandler) context.getBean("UserNameEventHandler");
             case 3:
                 return new RoomMakingEventHandler();
             case 4:
-                return new RoomNameEventHandler();
+                return (RoomNameEventHandler) context.getBean("RoomNameEventHandler");
             case 5:
-                return new RoomNumberEventHandler();
+                return (RoomNumberEventHandler) context.getBean("RoomNumberEventHandler");
             case 6:
                 return new InfoEventHandler();
         }

@@ -1,7 +1,7 @@
 /**
  * Created by sophie on 2015. 12. 15..
  */
-public class ClientInfo {
+class ClientInfo {
     private String name;
     private int roomNum;
 

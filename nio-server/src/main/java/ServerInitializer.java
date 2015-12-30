@@ -1,3 +1,6 @@
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousChannelGroup;
@@ -16,16 +19,15 @@ public class ServerInitializer {
 
     public static void main(String[] args) {
         System.out.println("Server Start!");
-
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-
+        EventHandlerFactory factory = new EventHandlerFactory();
         try {
             AsynchronousChannelGroup group = AsynchronousChannelGroup.withCachedThreadPool(executor, INITIAL_SIZE);
 
             // 스트림 지향의 리스닝 소켓을 위한 비동기 채널
             AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open(group);
             listener.bind(new InetSocketAddress(PORT), BACK_LOG);
-            listener.accept(listener, new Dispatcher());
+            listener.accept(listener, new Dispatcher(factory));
         } catch (IOException e) {
             e.printStackTrace();
         }

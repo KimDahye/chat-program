@@ -1,3 +1,4 @@
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -5,12 +6,8 @@ import java.nio.ByteBuffer;
  * Created by sophie on 2015. 12. 14..
  */
 class ChatEventHandler extends AbstractNioEventHandler {
+    @Resource
     private RoomListManager roomListManager;
-
-    public void setRoomListManager(RoomListManager roomListManager) {
-        System.out.println("DI with setter");
-        this.roomListManager = roomListManager;
-    }
 
     public void completed(Integer result, ByteBuffer buffer) {
         if(result == -1) {
@@ -31,7 +28,7 @@ class ChatEventHandler extends AbstractNioEventHandler {
 
             // 다시 읽기 준비
             ByteBuffer newBuffer = ByteBuffer.allocate(HEADER_SIZE);
-            channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
+            channel.read(newBuffer, newBuffer, new Demultiplexer(channel, factory));
         }
     }
 

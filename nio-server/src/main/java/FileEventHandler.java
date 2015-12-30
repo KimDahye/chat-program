@@ -1,3 +1,4 @@
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -5,7 +6,9 @@ import java.nio.ByteBuffer;
  * Created by sophie on 2015. 12. 14..
  */
 class FileEventHandler extends AbstractNioEventHandler {
-    private RoomListManager roomListManager = RoomListManager.getInstance();
+    @Resource
+    private RoomListManager roomListManager;
+
     private int currentLength = 0;
     private final int DEFAULT_BUFFER_SIZE = 2048;
 
@@ -38,7 +41,7 @@ class FileEventHandler extends AbstractNioEventHandler {
             } else if(currentLength == length) {
                 // 다시 헤더 읽기 준비
                 ByteBuffer newBuffer = ByteBuffer.allocate(HEADER_SIZE);
-                channel.read(newBuffer, newBuffer, new Demultiplexer(channel));
+                channel.read(newBuffer, newBuffer, new Demultiplexer(channel, factory));
             }
         }
     }

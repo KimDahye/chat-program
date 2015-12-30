@@ -1,7 +1,7 @@
 /**
  * Created by sophie on 2015. 12. 15..
  */
-public class ProtocolString {
+class ProtocolString {
     //UserNameEventHandler 에서 필요
     public static final String INFO_MESSAGE_NO_ROOM = "There is no room. You should make the first room!";
     public static final String ASKING_MESSAGE_MAKING = "Do you wanna make room? (yes/any key)";
